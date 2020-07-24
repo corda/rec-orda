@@ -41,9 +41,9 @@ object IssueFlows {
             progressTracker.currentStep = PREPARING_TO_PASS_ON
             // It is a design decision to have this flow initiated by the issuer.
             val rec = RECTokenState()
-            val issuedAirMile = IssuedTokenType(ourIdentity, rec)
+            val issuedREC = IssuedTokenType(ourIdentity, rec)
             val contractAttachment = rec.getAttachmentIdForGenericParam()
-            val outputTokens = heldQuantities.map { FungibleToken(amount(it.second, issuedAirMile), it.first, contractAttachment) }
+            val outputTokens = heldQuantities.map { FungibleToken(amount(it.second, issuedREC), it.first, contractAttachment) }
             progressTracker.currentStep = PASSING_TO_SUB_ISSUE
             val notarised = subFlow(IssueTokens(outputTokens, emptyList()))
 
