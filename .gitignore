@@ -1,0 +1,20 @@
+# Gradle generated files
+gradlew
+gradlew.bat
+.gradle
+build
+
+bin
+logs
+
+
+# Not sure
+.settings
+config
+
+# IntelliJ generated files
+.idea
+out
+
+# MacOS generated files
+.DS_Store
