@@ -39,7 +39,9 @@ object RedeemFlows {
 
             if (allIssuers.size != 1) throw FlowException("It can only redeem one issuer at a time.")
 
-            val issuerSession = initiateFlow(allIssuers.iterator().next())
+            val issuer = allIssuers.single()
+
+            val issuerSession = initiateFlow(issuer)
 
             progressTracker.currentStep = PASSING_TO_SUB_REDEEM
 
