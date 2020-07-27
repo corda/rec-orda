@@ -6,24 +6,24 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 
 
-class RECTokenStateTest {
+class RECTokenTypeTest {
     @Test
     fun hashCodeIsConstant() {
-        assertEquals(RECTokenState.hashCode(), RECTokenState.hashCode())
+        assertEquals(RECTokenType.hashCode(), RECTokenType.hashCode())
     }
 
     @Test
     fun equalsIsOkWithSame() {
-        assertEquals(RECTokenState, RECTokenState)
+        assertEquals(RECTokenType, RECTokenType)
     }
 
     @Test
     fun equalsIsDifferentWithNull() {
-        assertNotEquals(RECTokenState, null)
+        assertNotEquals(RECTokenType, null)
     }
 
     @Test
     fun equalsIsDifferentWithOtherTokenType() {
-        assertNotEquals(RECTokenState, TokenType(RECTokenState.IDENTIFIER, RECTokenState.FRACTION_DIGITS))
+        assertNotEquals(RECTokenType, TokenType(RECTokenType.IDENTIFIER, RECTokenType.FRACTION_DIGITS))
     }
 }
