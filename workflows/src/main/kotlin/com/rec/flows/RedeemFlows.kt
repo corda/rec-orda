@@ -26,7 +26,8 @@ object RedeemFlows {
     @StartableByRPC
     class Initiator(
       private val inputTokens: List<StateAndRef<FungibleToken>>,
-      override val progressTracker: ProgressTracker = tracker()) : FlowLogic<SignedTransaction?>() {
+      override val progressTracker: ProgressTracker = tracker()
+    ) : FlowLogic<SignedTransaction?>() {
 
         @Suspendable
         @Throws(FlowException::class)

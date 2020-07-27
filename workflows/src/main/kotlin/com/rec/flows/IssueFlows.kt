@@ -25,7 +25,10 @@ object IssueFlows {
      * It may contain a given [Party] more than once, so that we can issue multiple states to a given holder.
      */
     @StartableByRPC
-    class Initiator(private val heldQuantities: List<Pair<AbstractParty, Long>>, override val progressTracker: ProgressTracker = tracker()) : FlowLogic<SignedTransaction>() {
+    class Initiator(
+            private val heldQuantities: List<Pair<AbstractParty, Long>>,
+            override val progressTracker: ProgressTracker = tracker()
+    ) : FlowLogic<SignedTransaction>() {
 
         /**
          * The only constructor that can be called from the CLI.
