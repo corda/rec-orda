@@ -9,14 +9,13 @@ import net.corda.core.identity.AbstractParty
 import net.corda.core.identity.CordaX500Name
 import net.corda.testing.node.*
 import java.io.File
-import java.io.FileReader
 import java.util.*
 import kotlin.test.assertEquals
 
 object FlowTestHelpers {
     private fun propertiesFromConf(pathname: String): Map<String, String> {
         val tokenProperties = Properties()
-        tokenProperties.load(FileReader(File(pathname)))
+        File(pathname).inputStream().let { tokenProperties.load(it) }
         return tokenProperties.entries
           .associateBy(
             { it.key as String },
