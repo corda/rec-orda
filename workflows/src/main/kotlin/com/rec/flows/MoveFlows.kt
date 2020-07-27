@@ -19,6 +19,7 @@ import com.rec.states.RECTokenType
 import net.corda.core.contracts.Amount
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.flows.*
+import net.corda.core.identity.AbstractParty
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
@@ -39,7 +40,14 @@ object MoveFlows {
       override val progressTracker: ProgressTracker = tracker()
     ) : FlowLogic<SignedTransaction?>() {
 
-        private val holder = inputTokens.map { it.state.data.holder }.distinct().single()
+        private val holder: AbstractParty
+
+        init {
+            val holders = inputTokens.map { it.state.data.holder }.distinct()
+            if (holders.size != 1) throw IllegalArgumentException("There can be only one holder")
+            holder = holders.single()
+        }
+
 
         @Suspendable
         @Throws(FlowException::class)
