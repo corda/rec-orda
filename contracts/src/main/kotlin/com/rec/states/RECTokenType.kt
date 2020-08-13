@@ -7,7 +7,7 @@ import net.corda.core.crypto.SecureHash
 class RECTokenType : TokenType(IDENTIFIER, FRACTION_DIGITS) {
     companion object {
         val contractAttachment: SecureHash = RECTokenType().getAttachmentIdForGenericParam()!!
-        const val IDENTIFIER = "AIR"
+        const val IDENTIFIER = "REC"
         const val FRACTION_DIGITS = 0
     }
 }
