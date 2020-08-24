@@ -2,11 +2,8 @@ package com.rec.flows
 
 import co.paralleluniverse.fibers.Suspendable
 import com.r3.corda.lib.tokens.contracts.states.FungibleToken
-import com.r3.corda.lib.tokens.contracts.types.IssuedTokenType
-import com.r3.corda.lib.tokens.contracts.utilities.*
 import com.r3.corda.lib.tokens.workflows.flows.rpc.IssueTokens
-import com.rec.states.RECTokenType
-import net.corda.core.contracts.Amount
+import com.rec.states.RECToken
 import net.corda.core.flows.FlowException
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.InitiatingFlow
@@ -43,7 +40,7 @@ object IssueFlows {
             // It is a design decision to have this flow initiated by the issuer.
 
             val outputTokens = heldQuantities.map { (holder, quantity) ->
-                quantity of RECTokenType() issuedBy ourIdentity heldBy holder
+                RECToken(ourIdentity, holder, quantity)
             }
 
             progressTracker.currentStep = PASSING_TO_SUB_ISSUE
