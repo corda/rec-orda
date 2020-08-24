@@ -3,6 +3,7 @@ package com.rec.flows
 import com.r3.corda.lib.tokens.contracts.states.FungibleToken
 import com.r3.corda.lib.tokens.contracts.types.IssuedTokenType
 import com.r3.corda.lib.tokens.contracts.utilities.amount
+import com.rec.states.RECToken
 import com.rec.states.RECTokenType
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.identity.AbstractParty
@@ -49,6 +50,12 @@ object FlowTestHelpers {
       amount = amount(quantity, IssuedTokenType(issuer.info.legalIdentities.first(), RECTokenType())),
       holder = holder.info.legalIdentities.first(),
       tokenTypeJarHash = RECTokenType.contractAttachment
+    )
+
+    fun createFromRECToken(issuer: StartedMockNode, holder: StartedMockNode, quantity: Long) = RECToken(
+      issuer = issuer.info.legalIdentities.first(),
+      holder = holder.info.legalIdentities.first(),
+      quantity = quantity
     )
 
     fun FungibleToken.toPair() = Pair(this.holder, this.amount.quantity)
