@@ -2,7 +2,6 @@ package com.rec.states
 
 import net.corda.core.identity.CordaX500Name
 import net.corda.testing.core.TestIdentity
-import org.junit.Assert
 import org.junit.Test
 import kotlin.test.assertEquals
 
