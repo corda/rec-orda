@@ -1,8 +1,11 @@
 package com.rec.contracts
 
+import com.r3.corda.lib.tokens.contracts.states.FungibleToken
+import com.rec.states.RECToken
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.requireSingleCommand
+import net.corda.core.contracts.requireThat
 import net.corda.core.transactions.LedgerTransaction
 
 // ************
@@ -18,7 +21,11 @@ class RECTokenContract : Contract {
     // does not throw an exception.
     override fun verify(tx: LedgerTransaction) {
         // Verification logic goes here.
-//        val command = tx.commands.requireSingleCommand<Commands>()
+        val inputs = tx.inputsOfType<RECToken>()
+        val outputs = tx.outputsOfType<RECToken>()
+        val hasAllPositiveQuantities = inputs.all { 0 < it.quantity } && outputs.all { 0 < it.quantity }
+
+        requireThat { "All quantities must be above 0." using hasAllPositiveQuantities }
     }
 
     // Used to indicate the transaction's intent.
