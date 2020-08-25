@@ -7,6 +7,17 @@ import org.junit.Assert.assertNotEquals
 
 
 class RECTokenTypeTest {
+
+    @Test
+    fun similarSourcesAreEqual() {
+        assertEquals(RECTokenType(EnergySource.WIND), RECTokenType(EnergySource.WIND))
+    }
+
+    @Test
+    fun differentSourcesAreNotEqual() {
+        assertNotEquals(RECTokenType(EnergySource.WIND), RECTokenType(EnergySource.SOLAR))
+    }
+
     @Test
     fun hashCodeIsConstant() {
         assertEquals(RECTokenType.hashCode(), RECTokenType.hashCode())
