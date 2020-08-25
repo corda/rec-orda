@@ -45,7 +45,7 @@ class RedeemFlowsTests {
     @Throws(Throwable::class)
     fun signedTransactionReturnedByTheFlowIsSignedByBothTheIssuerAndTheHolder() {
         val tokens = issueTokens(
-          alice, network, listOf(NodeHolding(bob, 10L)))
+                alice, network, listOf(NodeHolding(bob, 10L)), source)
         val flow = Initiator(tokens)
         val future = bob.startFlow(flow)
         network.runNetwork()
@@ -57,8 +57,8 @@ class RedeemFlowsTests {
     @Test
     @Throws(Throwable::class)
     fun signedTransactionReturnedByTheFlowIsSignedByBothIssuersAndTheHolder() {
-        val tokens1 = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)))
-        val tokens = tokens1 + issueTokens(carly, network, listOf(NodeHolding(bob, 20L)))
+        val tokens1 = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
+        val tokens = tokens1 + issueTokens(carly, network, listOf(NodeHolding(bob, 20L)), source)
 
         val flow = Initiator(listOf(tokens[0]))
 
@@ -83,7 +83,7 @@ class RedeemFlowsTests {
     @Test
     @Throws(Throwable::class)
     fun flowRecordsATransactionInIssuerAndHolderTransactionStoragesOnly() {
-        val tokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)))
+        val tokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
         val flow = Initiator(tokens)
         val future = bob.startFlow(flow)
 
@@ -103,8 +103,8 @@ class RedeemFlowsTests {
     @Test
     @Throws(Throwable::class)
     fun flowRecordsATransactionInBothIssuersAndHolderTransactionStoragesOnly() {
-        val tokens1 = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)))
-        val tokens = tokens1 + (issueTokens(carly, network, listOf(NodeHolding(bob, 20L))))
+        val tokens1 = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
+        val tokens = tokens1 + (issueTokens(carly, network, listOf(NodeHolding(bob, 20L)), source))
 
         val flow = Initiator(listOf(tokens[0]))
 
@@ -125,9 +125,9 @@ class RedeemFlowsTests {
     @Throws(Throwable::class)
     fun flowRecordsATransactionInIssuerAndBothHolderTransactionStorages() {
         val tokens = issueTokens(
-          alice, network, listOf(
-          NodeHolding(bob, 10L),
-          NodeHolding(carly, 20L))
+                alice, network, listOf(
+                NodeHolding(bob, 10L),
+                NodeHolding(carly, 20L)), source
         )
 
         val flow = Initiator(listOf(tokens[0]))
@@ -151,7 +151,7 @@ class RedeemFlowsTests {
         val expected = createFrom(alice, bob, 10L, source)
 
         val tokens: List<StateAndRef<FungibleToken>> = issueTokens(
-          alice, network, listOf(NodeHolding(bob, 10L))
+                alice, network, listOf(NodeHolding(bob, 10L)), source
         )
 
         val flow = Initiator(tokens)
@@ -175,7 +175,7 @@ class RedeemFlowsTests {
     @Test
     @Throws(Throwable::class)
     fun thereIsNoRecordedStateAfterRedeem() {
-        val tokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)))
+        val tokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
 
         val flow = Initiator(tokens)
 
@@ -196,9 +196,9 @@ class RedeemFlowsTests {
         val expected = createFrom(alice, bob, 10L, source)
 
         val tokens: List<StateAndRef<FungibleToken>> = issueTokens(
-          alice, network, listOf(
-          NodeHolding(bob, 10L),
-          NodeHolding(carly, 20L))
+                alice, network, listOf(
+                NodeHolding(bob, 10L),
+                NodeHolding(carly, 20L)), source
         )
 
         val flow = Initiator(listOf(tokens[0]))
@@ -224,9 +224,9 @@ class RedeemFlowsTests {
     fun thereAreNoRecordedStatesAfterRedeem() {
         val expected = createFrom(alice, carly, 20L, source)
         val tokens = issueTokens(
-          alice, network, listOf(
-          NodeHolding(bob, 10L),
-          NodeHolding(carly, 20L))
+                alice, network, listOf(
+                NodeHolding(bob, 10L),
+                NodeHolding(carly, 20L)), source
         )
 
         val flow = Initiator(listOf(tokens[0]))

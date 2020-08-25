@@ -48,9 +48,9 @@ class MoveFlowsTests {
     fun flowFailsWhenInitiatorIsMissingTransactionsTheyWereNotPartyTo() {
 
         val issuedTokens = issueTokens(
-          alice, network, listOf(
-          NodeHolding(bob, 10L),
-          NodeHolding(dan, 20L))
+                alice, network, listOf(
+                NodeHolding(bob, 10L),
+                NodeHolding(dan, 20L)), source
         )
 
         val flow = Initiator(issuedTokens, listOf(createFrom(alice, dan, 30L, source)))
@@ -68,7 +68,7 @@ class MoveFlowsTests {
     @Test
     @Throws(Throwable::class)
     fun signedTransactionReturnedByTheFlowIsSignedByTheHolder() {
-        val issuedTokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)))
+        val issuedTokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
 
         val flow = Initiator(issuedTokens, listOf(createFrom(alice, carly, 10L, source)))
 
@@ -85,7 +85,7 @@ class MoveFlowsTests {
     @Test
     @Throws(Throwable::class)
     fun flowRecordsATransactionInHolderTransactionStoragesOnly() {
-        val issuedTokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)))
+        val issuedTokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
 
         val flow = Initiator(issuedTokens, listOf(createFrom(alice, carly, 10L, source)))
 
@@ -107,7 +107,7 @@ class MoveFlowsTests {
     @Test
     @Throws(Throwable::class)
     fun recordedTransactionHasASingleInputAndASingleOutput() {
-        val issuedTokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)))
+        val issuedTokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
 
         val expectedInput = issuedTokens[0].state.data
 
@@ -141,7 +141,7 @@ class MoveFlowsTests {
     fun recordedTransactionHasTwoInputsAnd1OutputSameIssuer() {
         val issuedTokens = issueTokens(alice, network, listOf(
           NodeHolding(bob, 10L),
-          NodeHolding(bob, 20L))
+          NodeHolding(bob, 20L)), source
         )
 
         val expectedInputs = issuedTokens.map { it.state.data }
@@ -176,7 +176,7 @@ class MoveFlowsTests {
     @Test
     @Throws(Throwable::class)
     fun thereIsOneRecordedStateAfterMoveOnlyInRecipientIssuerKeepsOldState() {
-        val issuedTokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)))
+        val issuedTokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
 
         val expectedOutput: FungibleToken = createFrom(alice, carly, 10L, source)
 
@@ -197,8 +197,8 @@ class MoveFlowsTests {
     @Test
     @Throws(Throwable::class)
     fun thereAreTwoRecordedStatesAfterMoveOnlyInRecipientDifferentIssuerIssuersKeepOldStates() {
-        val issuedTokens1 = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)))
-        val issuedTokens = issuedTokens1 + issueTokens(carly, network, listOf(NodeHolding(bob, 20L)))
+        val issuedTokens1 = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
+        val issuedTokens = issuedTokens1 + issueTokens(carly, network, listOf(NodeHolding(bob, 20L)), source)
 
         val expectedOutput1: FungibleToken = createFrom(alice, dan, 10L, source)
         val expectedOutput2: FungibleToken = createFrom(carly, dan, 20L, source)

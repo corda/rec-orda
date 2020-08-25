@@ -36,7 +36,7 @@ class IssueFlowsTests {
     @Test
     @Throws(Exception::class)
     fun signedTransactionPickedThePreferredNotary() {
-        val flow = IssueFlows.Initiator(bob.info.legalIdentities[0], 10L)
+        val flow = IssueFlows.Initiator(bob.info.legalIdentities[0], 10L, source)
         val future = alice.startFlow(flow)
         network.runNetwork()
         val tx = future.get()
@@ -46,7 +46,7 @@ class IssueFlowsTests {
     @Test
     @Throws(Exception::class)
     fun signedTransactionReturnedByTheFlowIsSignedByTheIssuer() {
-        val flow: IssueFlows.Initiator = IssueFlows.Initiator(bob.info.legalIdentities[0], 10L)
+        val flow: IssueFlows.Initiator = IssueFlows.Initiator(bob.info.legalIdentities[0], 10L, source)
         val future = alice.startFlow(flow)
         network.runNetwork()
         val tx = future.get()
@@ -56,7 +56,7 @@ class IssueFlowsTests {
     @Test
     @Throws(Exception::class)
     fun flowRecordsATransactionInIssuerAndHolderTransactionStoragesOnly() {
-        val flow: IssueFlows.Initiator = IssueFlows.Initiator(bob.info.legalIdentities[0], 10L)
+        val flow: IssueFlows.Initiator = IssueFlows.Initiator(bob.info.legalIdentities[0], 10L, source)
         val future = alice.startFlow(flow)
         network.runNetwork()
         val tx = future.get()
@@ -75,7 +75,7 @@ class IssueFlowsTests {
     fun flowRecordsATransactionInIssuerAndBothHolderTransactionStorages() {
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(listOf(
           Pair(bob.info.legalIdentities[0], 10L),
-          Pair(carly.info.legalIdentities[0], 20L)))
+          Pair(carly.info.legalIdentities[0], 20L)), source = source)
         val future = alice.startFlow(flow)
         network.runNetwork()
         val tx = future.get()
@@ -92,7 +92,7 @@ class IssueFlowsTests {
     fun recordedTransactionHasNoInputsAndASingleOutputTheFungibleToken() {
         val expected: FungibleToken = createFrom(alice, bob, 10L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(
-          expected.holder, expected.amount.quantity)
+                expected.holder, expected.amount.quantity, source)
         val future = alice.startFlow(flow)
         network.runNetwork()
         val tx = future.get()
@@ -113,7 +113,7 @@ class IssueFlowsTests {
     fun thereIs1CorrectRecordedState() {
         val expected: FungibleToken = createFrom(alice, bob, 10L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(
-          expected.holder, expected.amount.quantity)
+                expected.holder, expected.amount.quantity, source)
         val future = alice.startFlow<SignedTransaction>(flow)
         network.runNetwork()
         future.get()
@@ -130,7 +130,7 @@ class IssueFlowsTests {
         val expected2: FungibleToken = createFrom(alice, carly, 20L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(listOf(
           expected1.toPair(),
-          expected2.toPair()))
+          expected2.toPair()), source = source)
         val future = alice.startFlow(flow)
         network.runNetwork()
         val tx = future.get()
@@ -154,7 +154,7 @@ class IssueFlowsTests {
         val expected2: FungibleToken = createFrom(alice, carly, 20L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(listOf(
           expected1.toPair(),
-          expected2.toPair()))
+          expected2.toPair()), source = source)
         val future = alice.startFlow<SignedTransaction>(flow)
         network.runNetwork()
         future.get()
@@ -174,7 +174,7 @@ class IssueFlowsTests {
         val expected2: FungibleToken = createFrom(alice, bob, 20L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(listOf(
           expected1.toPair(),
-          expected2.toPair()))
+          expected2.toPair()), source = source)
         val future = alice.startFlow<SignedTransaction>(flow)
         network.runNetwork()
         val tx = future.get()
@@ -198,7 +198,7 @@ class IssueFlowsTests {
         val expected2: FungibleToken = createFrom(alice, bob, 20L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(listOf(
           expected1.toPair(),
-          expected2.toPair()))
+          expected2.toPair()), source = source)
         val future = alice.startFlow(flow)
         network.runNetwork()
         future.get()
