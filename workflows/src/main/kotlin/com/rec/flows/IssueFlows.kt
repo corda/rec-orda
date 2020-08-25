@@ -28,6 +28,7 @@ object IssueFlows {
     @StartableByRPC
     class Initiator(
             private val heldQuantities: List<Pair<AbstractParty, Long>>,
+            private val source: EnergySource,
             override val progressTracker: ProgressTracker = tracker()
     ) : FlowLogic<SignedTransaction>() {
 
@@ -35,7 +36,7 @@ object IssueFlows {
          * The only constructor that can be called from the CLI.
          * Started by the issuer to issue a single state.
          */
-        constructor(holder: AbstractParty, quantity: Long) : this(listOf(Pair(holder, quantity)))
+        constructor(holder: AbstractParty, quantity: Long, source: EnergySource) : this(listOf(Pair(holder, quantity)), source)
 
         @Suspendable
         @Throws(FlowException::class)
@@ -44,7 +45,7 @@ object IssueFlows {
             // It is a design decision to have this flow initiated by the issuer.
 
             val outputTokens = heldQuantities.map { (holder, quantity) ->
-                quantity of RECTokenType(EnergySource.WIND) issuedBy ourIdentity heldBy holder
+                quantity of RECTokenType(source) issuedBy ourIdentity heldBy holder
             }
 
             progressTracker.currentStep = PASSING_TO_SUB_ISSUE
