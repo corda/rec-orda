@@ -6,35 +6,35 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 
 
-class RECTokenTypeTest {
+class RECTokenTest {
 
     @Test
     fun similarSourcesAreEqual() {
-        assertEquals(RECTokenType(EnergySource.WIND), RECTokenType(EnergySource.WIND))
+        assertEquals(RECToken(EnergySource.WIND), RECToken(EnergySource.WIND))
     }
 
     @Test
     fun differentSourcesAreNotEqual() {
-        assertNotEquals(RECTokenType(EnergySource.WIND), RECTokenType(EnergySource.SOLAR))
+        assertNotEquals(RECToken(EnergySource.WIND), RECToken(EnergySource.SOLAR))
     }
 
     @Test
     fun hashCodeIsConstant() {
-        assertEquals(RECTokenType.hashCode(), RECTokenType.hashCode())
+        assertEquals(RECToken.hashCode(), RECToken.hashCode())
     }
 
     @Test
     fun equalsIsOkWithSame() {
-        assertEquals(RECTokenType, RECTokenType)
+        assertEquals(RECToken, RECToken)
     }
 
     @Test
     fun equalsIsDifferentWithNull() {
-        assertNotEquals(RECTokenType, null)
+        assertNotEquals(RECToken, null)
     }
 
     @Test
     fun equalsIsDifferentWithOtherTokenType() {
-        assertNotEquals(RECTokenType, TokenType(RECTokenType.IDENTIFIER, RECTokenType.FRACTION_DIGITS))
+        assertNotEquals(RECToken, TokenType(RECToken.IDENTIFIER, RECToken.FRACTION_DIGITS))
     }
 }
