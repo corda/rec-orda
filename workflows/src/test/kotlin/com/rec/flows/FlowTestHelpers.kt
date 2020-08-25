@@ -4,7 +4,7 @@ import com.r3.corda.lib.tokens.contracts.states.FungibleToken
 import com.r3.corda.lib.tokens.contracts.types.IssuedTokenType
 import com.r3.corda.lib.tokens.contracts.utilities.amount
 import com.rec.states.EnergySource
-import com.rec.states.RECTokenType
+import com.rec.states.RECToken
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.identity.AbstractParty
 import net.corda.core.identity.CordaX500Name
@@ -47,9 +47,9 @@ object FlowTestHelpers {
       )
 
     fun createFrom(issuer: StartedMockNode, holder: StartedMockNode, quantity: Long, source: EnergySource) = FungibleToken(
-      amount = amount(quantity, IssuedTokenType(issuer.info.legalIdentities.first(), RECTokenType(source))),
+      amount = amount(quantity, IssuedTokenType(issuer.info.legalIdentities.first(), RECToken(source))),
       holder = holder.info.legalIdentities.first(),
-      tokenTypeJarHash = RECTokenType.contractAttachment
+      tokenTypeJarHash = RECToken.contractAttachment
     )
 
     fun FungibleToken.toPair() = Pair(this.holder, this.amount.quantity)

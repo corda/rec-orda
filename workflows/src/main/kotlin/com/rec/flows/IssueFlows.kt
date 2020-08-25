@@ -7,7 +7,7 @@ import com.r3.corda.lib.tokens.contracts.utilities.issuedBy
 import com.r3.corda.lib.tokens.contracts.utilities.of
 import com.r3.corda.lib.tokens.workflows.flows.rpc.IssueTokens
 import com.rec.states.EnergySource
-import com.rec.states.RECTokenType
+import com.rec.states.RECToken
 import net.corda.core.flows.FlowException
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.InitiatingFlow
@@ -45,7 +45,7 @@ object IssueFlows {
             // It is a design decision to have this flow initiated by the issuer.
 
             val outputTokens = heldQuantities.map { (holder, quantity) ->
-                quantity of RECTokenType(source) issuedBy ourIdentity heldBy holder
+                quantity of RECToken(source) issuedBy ourIdentity heldBy holder
             }
 
             progressTracker.currentStep = PASSING_TO_SUB_ISSUE
