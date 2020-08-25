@@ -71,8 +71,8 @@ object FlowTestHelpers {
         }
     }
 
-    fun issueTokens(node: StartedMockNode, network: MockNetwork, nodeHoldings: Collection<NodeHolding>): List<StateAndRef<FungibleToken>> {
-        val flow = IssueFlows.Initiator(nodeHoldings.map { it.toPair() })
+    fun issueTokens(node: StartedMockNode, network: MockNetwork, nodeHoldings: Collection<NodeHolding>, source: EnergySource): List<StateAndRef<FungibleToken>> {
+        val flow = IssueFlows.Initiator(nodeHoldings.map { it.toPair() }, source)
         val future = node.startFlow(flow)
         network.runNetwork()
         val tx = future.get()
