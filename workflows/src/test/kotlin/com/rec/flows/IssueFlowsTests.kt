@@ -6,6 +6,7 @@ import com.rec.flows.FlowTestHelpers.assertHasStatesInVault
 import com.rec.flows.FlowTestHelpers.createFrom
 import com.rec.flows.FlowTestHelpers.prepareMockNetworkParameters
 import com.rec.flows.FlowTestHelpers.toPair
+import com.rec.states.EnergySource
 import net.corda.core.transactions.SignedTransaction
 import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.StartedMockNode
@@ -20,6 +21,7 @@ class IssueFlowsTests {
     private val bob: StartedMockNode
     private val carly: StartedMockNode
     private val dan: StartedMockNode
+    private val source: EnergySource = EnergySource.values()[0]
 
     @Before
     fun setup() {
@@ -88,7 +90,7 @@ class IssueFlowsTests {
     @Test
     @Throws(Exception::class)
     fun recordedTransactionHasNoInputsAndASingleOutputTheFungibleToken() {
-        val expected: FungibleToken = createFrom(alice, bob, 10L)
+        val expected: FungibleToken = createFrom(alice, bob, 10L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(
           expected.holder, expected.amount.quantity)
         val future = alice.startFlow(flow)
@@ -109,7 +111,7 @@ class IssueFlowsTests {
     @Test
     @Throws(Exception::class)
     fun thereIs1CorrectRecordedState() {
-        val expected: FungibleToken = createFrom(alice, bob, 10L)
+        val expected: FungibleToken = createFrom(alice, bob, 10L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(
           expected.holder, expected.amount.quantity)
         val future = alice.startFlow<SignedTransaction>(flow)
@@ -124,8 +126,8 @@ class IssueFlowsTests {
     @Test
     @Throws(Exception::class)
     fun recordedTransactionHasNoInputsAndManyOutputsTheFungibleTokens() {
-        val expected1: FungibleToken = createFrom(alice, bob, 10L)
-        val expected2: FungibleToken = createFrom(alice, carly, 20L)
+        val expected1: FungibleToken = createFrom(alice, bob, 10L, source)
+        val expected2: FungibleToken = createFrom(alice, carly, 20L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(listOf(
           expected1.toPair(),
           expected2.toPair()))
@@ -148,8 +150,8 @@ class IssueFlowsTests {
     @Test
     @Throws(Exception::class)
     fun thereAre2CorrectStatesRecordedByRelevance() {
-        val expected1: FungibleToken = createFrom(alice, bob, 10L)
-        val expected2: FungibleToken = createFrom(alice, carly, 20L)
+        val expected1: FungibleToken = createFrom(alice, bob, 10L, source)
+        val expected2: FungibleToken = createFrom(alice, carly, 20L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(listOf(
           expected1.toPair(),
           expected2.toPair()))
@@ -168,8 +170,8 @@ class IssueFlowsTests {
     @Test
     @Throws(Exception::class)
     fun recordedTransactionHasNoInputsAnd2OutputsOfSameHolderTheFungibleTokens() {
-        val expected1: FungibleToken = createFrom(alice, bob, 10L)
-        val expected2: FungibleToken = createFrom(alice, bob, 20L)
+        val expected1: FungibleToken = createFrom(alice, bob, 10L, source)
+        val expected2: FungibleToken = createFrom(alice, bob, 20L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(listOf(
           expected1.toPair(),
           expected2.toPair()))
@@ -192,8 +194,8 @@ class IssueFlowsTests {
     @Test
     @Throws(Exception::class)
     fun thereAre2CorrectRecordedStatesAgain() {
-        val expected1: FungibleToken = createFrom(alice, bob, 10L)
-        val expected2: FungibleToken = createFrom(alice, bob, 20L)
+        val expected1: FungibleToken = createFrom(alice, bob, 10L, source)
+        val expected2: FungibleToken = createFrom(alice, bob, 20L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(listOf(
           expected1.toPair(),
           expected2.toPair()))

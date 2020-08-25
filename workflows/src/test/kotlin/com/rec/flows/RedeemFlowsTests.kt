@@ -8,6 +8,7 @@ import com.rec.flows.FlowTestHelpers.createFrom
 import com.rec.flows.FlowTestHelpers.issueTokens
 import com.rec.flows.FlowTestHelpers.prepareMockNetworkParameters
 import com.rec.flows.RedeemFlows.Initiator
+import com.rec.states.EnergySource
 import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.StateAndRef
 import net.corda.testing.node.MockNetwork
@@ -24,6 +25,7 @@ class RedeemFlowsTests {
     private val bob: StartedMockNode = network.createNode()
     private val carly: StartedMockNode = network.createNode()
     private val dan: StartedMockNode = network.createNode()
+    private val source: EnergySource = EnergySource.values()[0]
 
     init {
         listOf(alice, bob, carly, dan).forEach(Consumer { it.registerInitiatedFlow(Initiator::class.java, RedeemTokensFlowHandler::class.java) })
@@ -146,7 +148,7 @@ class RedeemFlowsTests {
     @Test
     @Throws(Throwable::class)
     fun recordedTransactionHasASingleInputTheFungibleTokenAndNoOutputs() {
-        val expected = createFrom(alice, bob, 10L)
+        val expected = createFrom(alice, bob, 10L, source)
 
         val tokens: List<StateAndRef<FungibleToken>> = issueTokens(
           alice, network, listOf(NodeHolding(bob, 10L))
@@ -191,7 +193,7 @@ class RedeemFlowsTests {
     @Test
     @Throws(Throwable::class)
     fun recordedTransactionHasManyInputsTheFungibleTokensAndNoOutputs() {
-        val expected = createFrom(alice, bob, 10L)
+        val expected = createFrom(alice, bob, 10L, source)
 
         val tokens: List<StateAndRef<FungibleToken>> = issueTokens(
           alice, network, listOf(
@@ -220,7 +222,7 @@ class RedeemFlowsTests {
     @Test
     @Throws(Throwable::class)
     fun thereAreNoRecordedStatesAfterRedeem() {
-        val expected = createFrom(alice, carly, 20L)
+        val expected = createFrom(alice, carly, 20L, source)
         val tokens = issueTokens(
           alice, network, listOf(
           NodeHolding(bob, 10L),
