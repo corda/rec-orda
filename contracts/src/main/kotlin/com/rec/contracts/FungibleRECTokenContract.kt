@@ -1,7 +1,9 @@
 package com.rec.contracts
 
+import com.rec.states.FungibleRECToken
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
+import net.corda.core.contracts.requireThat
 import net.corda.core.transactions.LedgerTransaction
 
 class FungibleRECTokenContract: Contract {
@@ -11,7 +13,11 @@ class FungibleRECTokenContract: Contract {
     }
 
     override fun verify(tx: LedgerTransaction) {
-        TODO("Not yet implemented")
+        val inputs = tx.inputsOfType<FungibleRECToken>()
+        val outputs = tx.outputsOfType<FungibleRECToken>()
+        val hasAllPositiveQuantities = inputs.all { 0 < it.amount.quantity } && outputs.all { 0 < it.amount.quantity }
+
+        requireThat { "All quantities must be above 0." using false }
     }
 
     // Used to indicate the transaction's intent.
