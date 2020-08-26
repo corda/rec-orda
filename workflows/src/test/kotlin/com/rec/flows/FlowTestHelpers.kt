@@ -48,8 +48,7 @@ object FlowTestHelpers {
 
     fun createFrom(issuer: StartedMockNode, holder: StartedMockNode, quantity: Long, source: EnergySource) = FungibleToken(
       amount = amount(quantity, IssuedTokenType(issuer.info.legalIdentities.first(), RECToken(source))),
-      holder = holder.info.legalIdentities.first(),
-      tokenTypeJarHash = RECToken.contractAttachment
+      holder = holder.info.legalIdentities.first()
     )
 
     fun FungibleToken.toPair() = Pair(this.holder, this.amount.quantity)
