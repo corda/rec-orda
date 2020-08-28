@@ -71,21 +71,12 @@ object FlowTestHelpers {
         }
     }
 
-    fun assertHasRECTokenAsTokenTypeInVault(node: StartedMockNode) {
-        val vaultTokens = node.transaction {
-            node.services.vaultService.queryBy(FungibleRECToken::class.java).states
-        }
-        vaultTokens.forEach {
-            assertTrue(it.state.data.tokenType is RECToken)
-        }
-    }
-
     fun assertHasSourceInVault(node: StartedMockNode, source: List<EnergySource>) {
         val vaultTokens = node.transaction {
             node.services.vaultService.queryBy(FungibleRECToken::class.java).states
         }
         vaultTokens.indices.forEach {
-            assertEquals((vaultTokens[it].state.data.tokenType as RECToken).source, source[it])
+            assertEquals(vaultTokens[it].state.data.recToken.source, source[it])
         }
     }
 
