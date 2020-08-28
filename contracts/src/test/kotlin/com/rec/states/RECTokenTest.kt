@@ -9,32 +9,32 @@ import org.junit.Assert.assertNotEquals
 class RECTokenTest {
 
     @Test
-    fun similarSourcesAreEqual() {
+    fun `similar sources are equal RECToken`() {
         assertEquals(RECToken(EnergySource.WIND), RECToken(EnergySource.WIND))
     }
 
     @Test
-    fun differentSourcesAreNotEqual() {
+    fun `different sources are not equal RECToken`() {
         assertNotEquals(RECToken(EnergySource.WIND), RECToken(EnergySource.SOLAR))
     }
 
     @Test
-    fun hashCodeIsConstant() {
+    fun `hash code is constant`() {
         assertEquals(RECToken.hashCode(), RECToken.hashCode())
     }
 
     @Test
-    fun equalsIsOkWithSame() {
+    fun `equals is ok with same`() {
         assertEquals(RECToken, RECToken)
     }
 
     @Test
-    fun equalsIsDifferentWithNull() {
+    fun `equals is different with null`() {
         assertNotEquals(RECToken, null)
     }
 
     @Test
-    fun equalsIsDifferentWithOtherTokenType() {
+    fun `equals is different with other TokenType`() {
         assertNotEquals(RECToken, TokenType(RECToken.IDENTIFIER, RECToken.FRACTION_DIGITS))
     }
 }
