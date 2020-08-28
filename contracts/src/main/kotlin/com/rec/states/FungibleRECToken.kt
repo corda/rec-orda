@@ -2,6 +2,7 @@ package com.rec.states
 
 import com.r3.corda.lib.tokens.contracts.states.FungibleToken
 import com.r3.corda.lib.tokens.contracts.types.IssuedTokenType
+import com.r3.corda.lib.tokens.contracts.types.TokenType
 import com.rec.contracts.FungibleRECTokenContract
 import net.corda.core.contracts.Amount
 import net.corda.core.contracts.BelongsToContract
@@ -16,6 +17,8 @@ class FungibleRECToken(
     init {
         assert(tokenType is RECToken)
     }
+
+    val recToken: RECToken = tokenType as RECToken
 
     override infix fun withNewHolder(newHolder: AbstractParty): FungibleRECToken = FungibleRECToken(amount, newHolder)
 
