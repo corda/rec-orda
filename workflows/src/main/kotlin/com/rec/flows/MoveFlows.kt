@@ -1,11 +1,11 @@
 package com.rec.flows
 
 import co.paralleluniverse.fibers.Suspendable
-import com.r3.corda.lib.tokens.contracts.states.FungibleToken
 import com.r3.corda.lib.tokens.workflows.flows.move.AbstractMoveTokensFlow
 import com.r3.corda.lib.tokens.workflows.flows.move.addMoveTokens
 import com.r3.corda.lib.tokens.workflows.flows.rpc.MoveFungibleTokensHandler
 import com.r3.corda.lib.tokens.workflows.utilities.sessionsForParties
+import com.rec.states.FungibleRECToken
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.flows.*
 import net.corda.core.identity.AbstractParty
@@ -15,7 +15,7 @@ import net.corda.core.utilities.ProgressTracker
 
 object MoveFlows {
     /**
-     * Started by a [FungibleToken.holder] to move multiple states where it is the only holder.
+     * Started by a [FungibleRECToken.holder] to move multiple states where it is the only holder.
      * It is an [InitiatingFlow] flow and its counterpart, which already exists, is
      * [MoveFungibleTokensHandler], while not being automatically [InitiatedBy] it.
      * This constructor would be called by RPC or by [FlowLogic.subFlow]. In particular one that, given sums,
@@ -24,9 +24,9 @@ object MoveFlows {
     @InitiatingFlow
     @StartableByRPC
     class Initiator(
-      private val inputTokens: List<StateAndRef<FungibleToken>>,
-      private val outputTokens: List<FungibleToken>,
-      override val progressTracker: ProgressTracker = tracker()
+            private val inputTokens: List<StateAndRef<FungibleRECToken>>,
+            private val outputTokens: List<FungibleRECToken>,
+            override val progressTracker: ProgressTracker = tracker()
     ) : FlowLogic<SignedTransaction?>() {
 
         private val holder: AbstractParty
