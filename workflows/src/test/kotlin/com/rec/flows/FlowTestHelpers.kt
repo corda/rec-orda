@@ -1,8 +1,5 @@
 package com.rec.flows
 
-import com.r3.corda.lib.tokens.contracts.states.FungibleToken
-import com.r3.corda.lib.tokens.contracts.types.IssuedTokenType
-import com.r3.corda.lib.tokens.contracts.utilities.amount
 import com.r3.corda.lib.tokens.contracts.utilities.issuedBy
 import com.r3.corda.lib.tokens.contracts.utilities.of
 import com.rec.states.EnergySource
@@ -60,12 +57,12 @@ object FlowTestHelpers {
             issuer.info.legalIdentities.first() heldBy
             holder.info.legalIdentities.first()
 
-    fun FungibleToken.toPair() = Pair(this.holder, this.amount.quantity)
+    fun FungibleRECToken.toPair() = Pair(this.holder, this.amount.quantity)
 
 
-    fun assertHasStatesInVault(node: StartedMockNode, tokenStates: List<FungibleToken>) {
+    fun assertHasStatesInVault(node: StartedMockNode, tokenStates: List<FungibleRECToken>) {
         val vaultTokens = node.transaction {
-            node.services.vaultService.queryBy(FungibleToken::class.java).states
+            node.services.vaultService.queryBy(FungibleRECToken::class.java).states
         }
         assertEquals(tokenStates.size, vaultTokens.size)
         tokenStates.indices.forEach {
