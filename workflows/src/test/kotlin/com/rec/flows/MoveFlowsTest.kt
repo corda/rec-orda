@@ -46,7 +46,7 @@ class MoveFlowsTest {
 
     @Test(expected = IllegalArgumentException::class)
     @Throws(Throwable::class)
-    fun flowFailsWhenInitiatorIsMissingTransactionsTheyWereNotPartyTo() {
+    fun `flow fails when initiator is missing transactions they were not party to`() {
 
         val issuedTokens = issueTokens(
                 alice, network, listOf(
@@ -68,7 +68,7 @@ class MoveFlowsTest {
 
     @Test
     @Throws(Throwable::class)
-    fun signedTransactionReturnedByTheFlowIsSignedByTheHolder() {
+    fun `signed transaction returned by the flow is signed by the holder`() {
         val issuedTokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
 
         val flow = Initiator(issuedTokens, listOf(createFrom(alice, carly, 10L, source)))
@@ -85,7 +85,7 @@ class MoveFlowsTest {
 
     @Test
     @Throws(Throwable::class)
-    fun flowRecordsATransactionInHolderTransactionStoragesOnly() {
+    fun `flow records a transaction in holder transaction storage only`() {
         val issuedTokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
 
         val flow = Initiator(issuedTokens, listOf(createFrom(alice, carly, 10L, source)))
@@ -96,7 +96,7 @@ class MoveFlowsTest {
 
         val tx = future.get()!!
 
-        // We check the recorded transaction in both transaction storages.
+        // We check the recorded transaction in both transaction storage.
         for (node in listOf(bob, carly)) {
             assertEquals(tx, node.services.validatedTransactions.getTransaction(tx.id))
         }
@@ -107,7 +107,7 @@ class MoveFlowsTest {
 
     @Test
     @Throws(Throwable::class)
-    fun recordedTransactionHasASingleInputAndASingleOutput() {
+    fun `recorded transaction has a single input and a single output`() {
         val issuedTokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
 
         val expectedInput = issuedTokens[0].state.data
@@ -139,7 +139,7 @@ class MoveFlowsTest {
 
     @Test
     @Throws(Throwable::class)
-    fun recordedTransactionHasTwoInputsAnd1OutputSameIssuer() {
+    fun `recorded transaction has two inputs and one output same issuer`() {
         val issuedTokens = issueTokens(alice, network, listOf(
           NodeHolding(bob, 10L),
           NodeHolding(bob, 20L)), source
@@ -176,7 +176,7 @@ class MoveFlowsTest {
 
     @Test
     @Throws(Throwable::class)
-    fun thereIsOneRecordedStateAfterMoveOnlyInRecipientIssuerKeepsOldState() {
+    fun `there is one recorded state after move only in recipient issuer keeps old state`() {
         val issuedTokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
 
         val expectedOutput: FungibleRECToken = createFrom(alice, carly, 10L, source)
@@ -197,7 +197,7 @@ class MoveFlowsTest {
 
     @Test
     @Throws(Throwable::class)
-    fun statesAllHaveTheCorrectSource() {
+    fun `states all have the correct source`() {
         val issuedTokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
 
         val expectedOutput: FungibleRECToken = createFrom(alice, carly, 10L, source)
@@ -218,7 +218,7 @@ class MoveFlowsTest {
 
     @Test
     @Throws(Throwable::class)
-    fun thereAreTwoRecordedStatesAfterMoveOnlyInRecipientDifferentIssuerIssuersKeepOldStates() {
+    fun `there are two recorded states after move only in recipient different issuer and issuers keep old states`() {
         val issuedTokens1 = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
         val issuedTokens = issuedTokens1 + issueTokens(carly, network, listOf(NodeHolding(bob, 20L)), source)
 
@@ -241,7 +241,7 @@ class MoveFlowsTest {
 
     @Test
     @Throws(Throwable::class)
-    fun bothStatesAllHaveTheCorrectSource() {
+    fun `both states all have the correct source`() {
         val issuedTokens1 = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
         val issuedTokens = issuedTokens1 + issueTokens(carly, network, listOf(NodeHolding(bob, 20L)), source)
 
