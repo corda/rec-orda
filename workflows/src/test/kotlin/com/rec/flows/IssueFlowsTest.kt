@@ -1,6 +1,8 @@
 package com.rec.flows
 
 import com.google.common.collect.ImmutableList
+import com.rec.flows.FlowTestHelpers.assertHasRECTokenAsTokenTypeInVault
+import com.rec.flows.FlowTestHelpers.assertHasSourceInVault
 import com.rec.flows.FlowTestHelpers.assertHasStatesInVault
 import com.rec.flows.FlowTestHelpers.createFrom
 import com.rec.flows.FlowTestHelpers.prepareMockNetworkParameters
@@ -124,6 +126,36 @@ class IssueFlowsTest {
 
     @Test
     @Throws(Exception::class)
+    fun recordedStateHasRECTokenTokenType() {
+        val expected: FungibleRECToken = createFrom(alice, bob, 10L, source)
+        val flow: IssueFlows.Initiator = IssueFlows.Initiator(
+                expected.holder, expected.amount.quantity, source)
+        val future = alice.startFlow(flow)
+        network.runNetwork()
+        future.get()
+
+        // We check the recorded state in both vaults have RECToken TokenType.
+        assertHasRECTokenAsTokenTypeInVault(alice)
+        assertHasRECTokenAsTokenTypeInVault(bob)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun recordedStateHasCorrectSource() {
+        val expected: FungibleRECToken = createFrom(alice, bob, 10L, source)
+        val flow: IssueFlows.Initiator = IssueFlows.Initiator(
+                expected.holder, expected.amount.quantity, source)
+        val future = alice.startFlow(flow)
+        network.runNetwork()
+        future.get()
+
+        // We check the recorded state in both vaults have the correct source.
+        assertHasSourceInVault(alice, listOf(source))
+        assertHasSourceInVault(bob, listOf(source))
+    }
+
+    @Test
+    @Throws(Exception::class)
     fun recordedTransactionHasNoInputsAndManyOutputsTheFungibleRECTokens() {
         val expected1: FungibleRECToken = createFrom(alice, bob, 10L, source)
         val expected2: FungibleRECToken = createFrom(alice, carly, 20L, source)
@@ -164,6 +196,42 @@ class IssueFlowsTest {
         assertHasStatesInVault(bob, ImmutableList.of(expected1))
         assertHasStatesInVault(carly, ImmutableList.of(expected2))
         assertHasStatesInVault(dan, emptyList())
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun recordedStateBothHaveRECTokenTokenType() {
+        val expected1: FungibleRECToken = createFrom(alice, bob, 10L, source)
+        val expected2: FungibleRECToken = createFrom(alice, carly, 20L, source)
+        val flow: IssueFlows.Initiator = IssueFlows.Initiator(listOf(
+                expected1.toPair(),
+                expected2.toPair()), source = source)
+        val future = alice.startFlow(flow)
+        network.runNetwork()
+        future.get()
+
+        // We check the recorded state in both vaults have RECToken TokenType.
+        assertHasRECTokenAsTokenTypeInVault(alice)
+        assertHasRECTokenAsTokenTypeInVault(bob)
+        assertHasRECTokenAsTokenTypeInVault(carly)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun recordedStateBothHaveCorrectSource() {
+        val expected1: FungibleRECToken = createFrom(alice, bob, 10L, source)
+        val expected2: FungibleRECToken = createFrom(alice, carly, 20L, source)
+        val flow: IssueFlows.Initiator = IssueFlows.Initiator(listOf(
+                expected1.toPair(),
+                expected2.toPair()), source = source)
+        val future = alice.startFlow(flow)
+        network.runNetwork()
+        future.get()
+
+        // We check the recorded state in both vaults have the correct source.
+        assertHasSourceInVault(alice, listOf(source, source))
+        assertHasSourceInVault(bob, listOf(source))
+        assertHasSourceInVault(carly, listOf(source))
     }
 
     @Test
