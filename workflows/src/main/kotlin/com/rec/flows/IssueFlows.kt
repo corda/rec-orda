@@ -2,12 +2,13 @@ package com.rec.flows
 
 import co.paralleluniverse.fibers.Suspendable
 import com.r3.corda.lib.tokens.contracts.states.FungibleToken
-import com.r3.corda.lib.tokens.contracts.utilities.heldBy
 import com.r3.corda.lib.tokens.contracts.utilities.issuedBy
 import com.r3.corda.lib.tokens.contracts.utilities.of
 import com.r3.corda.lib.tokens.workflows.flows.rpc.IssueTokens
 import com.rec.states.EnergySource
+import com.rec.states.FungibleRECToken
 import com.rec.states.RECToken
+import com.rec.states.heldBy
 import net.corda.core.flows.FlowException
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.InitiatingFlow
@@ -44,7 +45,7 @@ object IssueFlows {
             progressTracker.currentStep = PREPARING_TO_PASS_ON
             // It is a design decision to have this flow initiated by the issuer.
 
-            val outputTokens = heldQuantities.map { (holder, quantity) ->
+            val outputTokens: List<FungibleRECToken> = heldQuantities.map { (holder, quantity) ->
                 quantity of RECToken(source) issuedBy ourIdentity heldBy holder
             }
 
