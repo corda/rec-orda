@@ -43,7 +43,7 @@ class RedeemFlowsTest {
 
     @Test
     @Throws(Throwable::class)
-    fun signedTransactionReturnedByTheFlowIsSignedByBothTheIssuerAndTheHolder() {
+    fun `signed transaction returned by the flow is signed by both the issuer and the holder`() {
         val tokens = issueTokens(
                 alice, network, listOf(NodeHolding(bob, 10L)), source)
         val flow = Initiator(tokens)
@@ -56,7 +56,7 @@ class RedeemFlowsTest {
 
     @Test
     @Throws(Throwable::class)
-    fun signedTransactionReturnedByTheFlowIsSignedByBothIssuersAndTheHolder() {
+    fun `signed transaction returned by the flow is signed by both issuers and the holder`() {
         val tokens1 = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
         val tokens = tokens1 + issueTokens(carly, network, listOf(NodeHolding(bob, 20L)), source)
 
@@ -82,7 +82,7 @@ class RedeemFlowsTest {
 
     @Test
     @Throws(Throwable::class)
-    fun flowRecordsATransactionInIssuerAndHolderTransactionStoragesOnly() {
+    fun `flow records a transaction in issuer and holder transaction storage only`() {
         val tokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
         val flow = Initiator(tokens)
         val future = bob.startFlow(flow)
@@ -91,7 +91,7 @@ class RedeemFlowsTest {
 
         val tx = future.get()!!
 
-        // We check the recorded transaction in both transaction storages.
+        // We check the recorded transaction in both transaction storage.
         for (node in listOf(alice, bob)) {
             assertEquals(tx, node.services.validatedTransactions.getTransaction(tx.id))
         }
@@ -102,7 +102,7 @@ class RedeemFlowsTest {
 
     @Test
     @Throws(Throwable::class)
-    fun flowRecordsATransactionInBothIssuersAndHolderTransactionStoragesOnly() {
+    fun `flow records a transaction in both issuers and holder transaction storage only`() {
         val tokens1 = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
         val tokens = tokens1 + (issueTokens(carly, network, listOf(NodeHolding(bob, 20L)), source))
 
@@ -114,7 +114,7 @@ class RedeemFlowsTest {
 
         val tx = future.get()!!
 
-        // We check the recorded transaction in both transaction storages.
+        // We check the recorded transaction in both transaction storage.
         for (node in listOf(alice, bob)) {
             assertEquals(tx, node.services.validatedTransactions.getTransaction(tx.id))
         }
@@ -123,7 +123,7 @@ class RedeemFlowsTest {
 
     @Test
     @Throws(Throwable::class)
-    fun flowRecordsATransactionInIssuerAndBothHolderTransactionStorages() {
+    fun `flow records a transaction in issuer and both holder transaction storage`() {
         val tokens = issueTokens(
                 alice, network, listOf(
                 NodeHolding(bob, 10L),
@@ -138,7 +138,7 @@ class RedeemFlowsTest {
 
         val tx = future.get()!!
 
-        // We check the recorded transaction in transaction storages.
+        // We check the recorded transaction in transaction storage.
         for (node in listOf(alice, bob)) {
             assertEquals(tx, node.services.validatedTransactions.getTransaction(tx.id))
         }
@@ -147,7 +147,7 @@ class RedeemFlowsTest {
 
     @Test
     @Throws(Throwable::class)
-    fun recordedTransactionHasASingleInputTheFungibleRECTokenAndNoOutputs() {
+    fun `recorded transaction has a single input the fungible RECToken and no outputs`() {
         val expected = createFrom(alice, bob, 10L, source)
 
         val tokens: List<StateAndRef<FungibleRECToken>> = issueTokens(
@@ -174,7 +174,7 @@ class RedeemFlowsTest {
 
     @Test
     @Throws(Throwable::class)
-    fun thereIsNoRecordedStateAfterRedeem() {
+    fun `there is no recorded state after redeem`() {
         val tokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
 
         val flow = Initiator(tokens)
@@ -192,7 +192,7 @@ class RedeemFlowsTest {
 
     @Test
     @Throws(Throwable::class)
-    fun recordedTransactionHasManyInputsTheFungibleRECTokensAndNoOutputs() {
+    fun `recorded transaction has many inputs the fungible RECTokens and no outputs`() {
         val expected = createFrom(alice, bob, 10L, source)
 
         val tokens: List<StateAndRef<FungibleRECToken>> = issueTokens(
@@ -221,7 +221,7 @@ class RedeemFlowsTest {
 
     @Test
     @Throws(Throwable::class)
-    fun thereAreNoRecordedStatesAfterRedeem() {
+    fun `there are no recorded states after redeem`() {
         val expected = createFrom(alice, carly, 20L, source)
         val tokens = issueTokens(
                 alice, network, listOf(
