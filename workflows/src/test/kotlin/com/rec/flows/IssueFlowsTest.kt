@@ -35,7 +35,7 @@ class IssueFlowsTest {
 
     @Test
     @Throws(Exception::class)
-    fun signedTransactionPickedThePreferredNotary() {
+    fun `signed transaction picked the preferred notary`() {
         val flow = IssueFlows.Initiator(bob.info.legalIdentities[0], 10L, source)
         val future = alice.startFlow(flow)
         network.runNetwork()
@@ -45,7 +45,7 @@ class IssueFlowsTest {
 
     @Test
     @Throws(Exception::class)
-    fun signedTransactionReturnedByTheFlowIsSignedByTheIssuer() {
+    fun `signed transaction returned by the flow is signed by the issuer`() {
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(bob.info.legalIdentities[0], 10L, source)
         val future = alice.startFlow(flow)
         network.runNetwork()
@@ -55,13 +55,13 @@ class IssueFlowsTest {
 
     @Test
     @Throws(Exception::class)
-    fun flowRecordsATransactionInIssuerAndHolderTransactionStoragesOnly() {
+    fun `flow records a transaction in issuer and holder transaction storage only`() {
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(bob.info.legalIdentities[0], 10L, source)
         val future = alice.startFlow(flow)
         network.runNetwork()
         val tx = future.get()
 
-        // We check the recorded transaction in both transaction storages.
+        // We check the recorded transaction in both transaction storage
         for (node in ImmutableList.of(alice, bob)) {
             Assert.assertEquals(tx, node.services.validatedTransactions.getTransaction(tx.id))
         }
@@ -72,7 +72,7 @@ class IssueFlowsTest {
 
     @Test
     @Throws(Exception::class)
-    fun flowRecordsATransactionInIssuerAndBothHolderTransactionStorages() {
+    fun `flow records a transaction in issuer and both holder transaction storage`() {
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(listOf(
           Pair(bob.info.legalIdentities[0], 10L),
           Pair(carly.info.legalIdentities[0], 20L)), source = source)
@@ -80,7 +80,7 @@ class IssueFlowsTest {
         network.runNetwork()
         val tx = future.get()
 
-        // We check the recorded transaction in transaction storages.
+        // We check the recorded transaction in transaction storage.
         for (node in ImmutableList.of(alice, bob, carly)) {
             Assert.assertEquals(tx, node.services.validatedTransactions.getTransaction(tx.id))
         }
@@ -89,7 +89,7 @@ class IssueFlowsTest {
 
     @Test
     @Throws(Exception::class)
-    fun recordedTransactionHasNoInputsAndASingleOutputTheFungibleRECToken() {
+    fun `recorded transaction has no inputs and a single output the fungible RECToken`() {
         val expected: FungibleRECToken = createFrom(alice, bob, 10L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(
                 expected.holder, expected.amount.quantity, source)
@@ -110,7 +110,7 @@ class IssueFlowsTest {
 
     @Test
     @Throws(Exception::class)
-    fun thereIs1CorrectRecordedState() {
+    fun `there is one correct recorded state`() {
         val expected: FungibleRECToken = createFrom(alice, bob, 10L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(
                 expected.holder, expected.amount.quantity, source)
@@ -125,7 +125,7 @@ class IssueFlowsTest {
 
     @Test
     @Throws(Exception::class)
-    fun recordedStateHasCorrectSource() {
+    fun `recorded state has correct source`() {
         val expected: FungibleRECToken = createFrom(alice, bob, 10L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(
                 expected.holder, expected.amount.quantity, source)
@@ -140,7 +140,7 @@ class IssueFlowsTest {
 
     @Test
     @Throws(Exception::class)
-    fun recordedTransactionHasNoInputsAndManyOutputsTheFungibleRECTokens() {
+    fun `recorded transaction has no inputs and many outputs the fungible RECTokens`() {
         val expected1: FungibleRECToken = createFrom(alice, bob, 10L, source)
         val expected2: FungibleRECToken = createFrom(alice, carly, 20L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(listOf(
@@ -164,7 +164,7 @@ class IssueFlowsTest {
 
     @Test
     @Throws(Exception::class)
-    fun thereAre2CorrectStatesRecordedByRelevance() {
+    fun `there are two correct states recorded by relevance`() {
         val expected1: FungibleRECToken = createFrom(alice, bob, 10L, source)
         val expected2: FungibleRECToken = createFrom(alice, carly, 20L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(listOf(
@@ -184,7 +184,7 @@ class IssueFlowsTest {
 
     @Test
     @Throws(Exception::class)
-    fun recordedStateBothHaveCorrectSource() {
+    fun `recorded state both have correct source`() {
         val expected1: FungibleRECToken = createFrom(alice, bob, 10L, source)
         val expected2: FungibleRECToken = createFrom(alice, carly, 20L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(listOf(
@@ -202,7 +202,7 @@ class IssueFlowsTest {
 
     @Test
     @Throws(Exception::class)
-    fun recordedTransactionHasNoInputsAnd2OutputsOfSameHolderTheFungibleRECTokens() {
+    fun `recorded transaction has no inputs and two outputs of same holder`() {
         val expected1: FungibleRECToken = createFrom(alice, bob, 10L, source)
         val expected2: FungibleRECToken = createFrom(alice, bob, 20L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(listOf(
@@ -226,7 +226,7 @@ class IssueFlowsTest {
 
     @Test
     @Throws(Exception::class)
-    fun thereAre2CorrectRecordedStatesAgain() {
+    fun `there are two correct recorded states again`() {
         val expected1: FungibleRECToken = createFrom(alice, bob, 10L, source)
         val expected2: FungibleRECToken = createFrom(alice, bob, 20L, source)
         val flow: IssueFlows.Initiator = IssueFlows.Initiator(listOf(
