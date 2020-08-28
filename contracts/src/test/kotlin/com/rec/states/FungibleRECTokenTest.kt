@@ -14,19 +14,25 @@ class FungibleRECTokenTest {
     private val source = EnergySource.values()[0]
 
     @Test
-    fun canCreateFungibleRECTokenWithRECToken() {
+    fun `can create fungible RECToken with RECToken TokenType`() {
         1 of RECToken(source) issuedBy alice heldBy bob
     }
 
     @Test(expected = AssertionError::class)
-    fun cannotCreateFungibleRECTokenWithOtherToken() {
+    fun `cannot create fungible RECToken with other TokenType`() {
         1 of TokenType(RECToken.IDENTIFIER, RECToken.FRACTION_DIGITS) issuedBy alice heldBy bob
     }
 
     @Test
-    fun canChangeFungibleRECTokenHolder() {
-        val rec = 1 of RECToken(source) issuedBy alice heldBy bob
-        rec withNewHolder alice
+    fun `can change fungible RECToken holder`() {
+        val fungibleToken = 1 of RECToken(source) issuedBy alice heldBy bob
+        fungibleToken withNewHolder alice
+    }
+
+    @Test
+    fun `can retrieve RECToken directly from fungible RECToken`() {
+        val fungibleToken = 1 of RECToken(source) issuedBy alice heldBy bob
+        fungibleToken.recToken
     }
 
 }
