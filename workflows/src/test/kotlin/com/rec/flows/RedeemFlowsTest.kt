@@ -243,6 +243,4 @@ class RedeemFlowsTest {
         assertHasStatesInVault(carly, listOf(expected))
         assertHasStatesInVault(dan, emptyList())
     }
-
-
 }
