@@ -23,15 +23,39 @@ class FungibleRECTokenContractTest {
     @Test
     fun `issue tests`() {
         ledgerServices.transaction {
+            output(FungibleRECTokenContract.contractId, 10 of issuedToken heldBy alice)
+
             // must include an attachment
             tweak {
-                output(FungibleRECTokenContract.contractId, 10 of issuedToken heldBy alice)
                 command(alice.owningKey, IssueTokenCommand(issuedToken, listOf(0)))
-                `fails with`("Cannot find contract attachments for com.rec.contracts.FungibleRECTokenContract")
+                this `fails with` "Cannot find contract attachments for com.rec.contracts.FungibleRECTokenContract"
+            }
+
+            // must include a command
+            tweak {
+                attachment("com.rec.contracts.FungibleRECTokenContract", RECToken(source).getAttachmentIdForGenericParam()!!)
+                this `fails with` "A transaction must contain at least one command"
+            }
+
+            // May include another token type and a matching command.
+            tweak {
+                val otherToken = RECToken(EnergySource.values()[1]) issuedBy alice
+                output(FungibleRECTokenContract.contractId, 10 of otherToken heldBy alice)
+                command(alice.owningKey, IssueTokenCommand(issuedToken, listOf(0)))
+                command(alice.owningKey, IssueTokenCommand(otherToken, listOf(1)))
+                verifies()
+            }
+
+            // May include more output states of the same token type.
+            tweak {
+                output(FungibleRECTokenContract.contractId, 10 of issuedToken heldBy alice)
+                output(FungibleRECTokenContract.contractId, 100 of issuedToken heldBy alice)
+                output(FungibleRECTokenContract.contractId, 1000 of issuedToken heldBy alice)
+                command(alice.owningKey, IssueTokenCommand(issuedToken, listOf(0, 1, 2, 3)))
+                verifies()
             }
 
             tweak {
-                output(FungibleRECTokenContract.contractId, 10 of issuedToken heldBy alice)
                 command(alice.owningKey, IssueTokenCommand(issuedToken, listOf(0)))
                 attachment("com.rec.contracts.FungibleRECTokenContract", RECToken(source).getAttachmentIdForGenericParam()!!)
                 verifies()
