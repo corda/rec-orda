@@ -1,6 +1,5 @@
 package com.rec.flows
 
-import com.r3.corda.lib.tokens.contracts.states.FungibleToken
 import com.r3.corda.lib.tokens.workflows.flows.redeem.RedeemTokensFlowHandler
 import com.rec.flows.FlowTestHelpers.NodeHolding
 import com.rec.flows.FlowTestHelpers.assertHasStatesInVault
@@ -9,6 +8,7 @@ import com.rec.flows.FlowTestHelpers.issueTokens
 import com.rec.flows.FlowTestHelpers.prepareMockNetworkParameters
 import com.rec.flows.RedeemFlows.Initiator
 import com.rec.states.EnergySource
+import com.rec.states.FungibleRECToken
 import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.StateAndRef
 import net.corda.testing.node.MockNetwork
@@ -147,10 +147,10 @@ class RedeemFlowsTests {
 
     @Test
     @Throws(Throwable::class)
-    fun recordedTransactionHasASingleInputTheFungibleTokenAndNoOutputs() {
+    fun recordedTransactionHasASingleInputTheFungibleRECTokenAndNoOutputs() {
         val expected = createFrom(alice, bob, 10L, source)
 
-        val tokens: List<StateAndRef<FungibleToken>> = issueTokens(
+        val tokens: List<StateAndRef<FungibleRECToken>> = issueTokens(
                 alice, network, listOf(NodeHolding(bob, 10L)), source
         )
 
@@ -192,10 +192,10 @@ class RedeemFlowsTests {
 
     @Test
     @Throws(Throwable::class)
-    fun recordedTransactionHasManyInputsTheFungibleTokensAndNoOutputs() {
+    fun recordedTransactionHasManyInputsTheFungibleRECTokensAndNoOutputs() {
         val expected = createFrom(alice, bob, 10L, source)
 
-        val tokens: List<StateAndRef<FungibleToken>> = issueTokens(
+        val tokens: List<StateAndRef<FungibleRECToken>> = issueTokens(
                 alice, network, listOf(
                 NodeHolding(bob, 10L),
                 NodeHolding(carly, 20L)), source
