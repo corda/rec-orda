@@ -21,7 +21,7 @@ import org.junit.Test
 import java.util.concurrent.ExecutionException
 import java.util.function.Consumer
 
-class MoveFlowsTests {
+class MoveFlowsTest {
     private val network: MockNetwork = MockNetwork(prepareMockNetworkParameters)
     private val alice: StartedMockNode = network.createNode()
     private val bob: StartedMockNode = network.createNode()
