@@ -2,6 +2,7 @@ package com.rec.flows
 
 import com.r3.corda.lib.tokens.workflows.flows.move.MoveTokensFlowHandler
 import com.rec.flows.FlowTestHelpers.NodeHolding
+import com.rec.flows.FlowTestHelpers.assertHasSourceInVault
 import com.rec.flows.FlowTestHelpers.assertHasStatesInVault
 import com.rec.flows.FlowTestHelpers.createFrom
 import com.rec.flows.FlowTestHelpers.issueTokens
@@ -196,6 +197,27 @@ class MoveFlowsTest {
 
     @Test
     @Throws(Throwable::class)
+    fun statesAllHaveTheCorrectSource() {
+        val issuedTokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
+
+        val expectedOutput: FungibleRECToken = createFrom(alice, carly, 10L, source)
+
+        val flow = Initiator(issuedTokens, listOf(expectedOutput))
+
+        val future = bob.startFlow(flow)
+
+        network.runNetwork()
+
+        future.get()
+
+        // We check the states in vaults have the correct source.
+        assertHasSourceInVault(alice, issuedTokens.map { it.state.data.recToken.source })
+        assertHasSourceInVault(bob, emptyList())
+        assertHasSourceInVault(carly, listOf(expectedOutput.recToken.source))
+    }
+
+    @Test
+    @Throws(Throwable::class)
     fun thereAreTwoRecordedStatesAfterMoveOnlyInRecipientDifferentIssuerIssuersKeepOldStates() {
         val issuedTokens1 = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
         val issuedTokens = issuedTokens1 + issueTokens(carly, network, listOf(NodeHolding(bob, 20L)), source)
@@ -217,4 +239,26 @@ class MoveFlowsTest {
         assertHasStatesInVault(dan, listOf(expectedOutput1, expectedOutput2))
     }
 
+    @Test
+    @Throws(Throwable::class)
+    fun bothStatesAllHaveTheCorrectSource() {
+        val issuedTokens1 = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
+        val issuedTokens = issuedTokens1 + issueTokens(carly, network, listOf(NodeHolding(bob, 20L)), source)
+
+        val expectedOutput1: FungibleRECToken = createFrom(alice, dan, 10L, source)
+        val expectedOutput2: FungibleRECToken = createFrom(carly, dan, 20L, source)
+
+        val flow = Initiator(issuedTokens, listOf(expectedOutput1, expectedOutput2))
+
+        val future = bob.startFlow(flow)
+
+        network.runNetwork()
+        future.get()
+
+        // We check the states in vaults have the correct source.
+        assertHasSourceInVault(alice, listOf(issuedTokens[0].state.data.recToken.source))
+        assertHasSourceInVault(bob, emptyList())
+        assertHasSourceInVault(carly, listOf(issuedTokens[1].state.data.recToken.source))
+        assertHasSourceInVault(dan, listOf(expectedOutput1.recToken.source, expectedOutput2.recToken.source))
+    }
 }
