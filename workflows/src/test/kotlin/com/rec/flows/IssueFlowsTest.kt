@@ -15,7 +15,7 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 
-class IssueFlowsTests {
+class IssueFlowsTest {
     private val network: MockNetwork = MockNetwork(prepareMockNetworkParameters)
     private val alice: StartedMockNode
     private val bob: StartedMockNode
