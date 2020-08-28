@@ -1,8 +1,8 @@
 package com.rec.flows
 
 import co.paralleluniverse.fibers.Suspendable
-import com.r3.corda.lib.tokens.contracts.states.FungibleToken
 import com.r3.corda.lib.tokens.workflows.flows.redeem.RedeemTokensFlow
+import com.rec.states.FungibleRECToken
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.flows.FlowException
 import net.corda.core.flows.FlowLogic
@@ -15,7 +15,7 @@ object RedeemFlows {
 
 
     /**
-     * Started by a $[FungibleToken.holder] to redeem multiple states of 1 issuer where it is one of the holders.
+     * Started by a $[FungibleRECToken.holder] to redeem multiple states of 1 issuer where it is one of the holders.
      * It is not $[InitiatingFlow].
      * This constructor would be called by RPC or by $[FlowLogic.subFlow].
      */
@@ -25,8 +25,8 @@ object RedeemFlows {
     @InitiatingFlow
     @StartableByRPC
     class Initiator(
-      private val inputTokens: List<StateAndRef<FungibleToken>>,
-      override val progressTracker: ProgressTracker = tracker()
+            private val inputTokens: List<StateAndRef<FungibleRECToken>>,
+            override val progressTracker: ProgressTracker = tracker()
     ) : FlowLogic<SignedTransaction?>() {
 
         @Suspendable

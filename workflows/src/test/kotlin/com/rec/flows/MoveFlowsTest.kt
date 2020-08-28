@@ -1,6 +1,5 @@
 package com.rec.flows
 
-import com.r3.corda.lib.tokens.contracts.states.FungibleToken
 import com.r3.corda.lib.tokens.workflows.flows.move.MoveTokensFlowHandler
 import com.rec.flows.FlowTestHelpers.NodeHolding
 import com.rec.flows.FlowTestHelpers.assertHasStatesInVault
@@ -9,6 +8,7 @@ import com.rec.flows.FlowTestHelpers.issueTokens
 import com.rec.flows.FlowTestHelpers.prepareMockNetworkParameters
 import com.rec.flows.MoveFlows.Initiator
 import com.rec.states.EnergySource
+import com.rec.states.FungibleRECToken
 import net.corda.core.contracts.ContractState
 import net.corda.core.contracts.TransactionResolutionException
 import net.corda.testing.node.MockNetwork
@@ -111,7 +111,7 @@ class MoveFlowsTest {
 
         val expectedInput = issuedTokens[0].state.data
 
-        val expectedOutput: FungibleToken = createFrom(alice, carly, 10L, source)
+        val expectedOutput: FungibleRECToken = createFrom(alice, carly, 10L, source)
 
         val flow = Initiator(issuedTokens, listOf(expectedOutput))
 
@@ -178,7 +178,7 @@ class MoveFlowsTest {
     fun thereIsOneRecordedStateAfterMoveOnlyInRecipientIssuerKeepsOldState() {
         val issuedTokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
 
-        val expectedOutput: FungibleToken = createFrom(alice, carly, 10L, source)
+        val expectedOutput: FungibleRECToken = createFrom(alice, carly, 10L, source)
 
         val flow = Initiator(issuedTokens, listOf(expectedOutput))
 
@@ -200,8 +200,8 @@ class MoveFlowsTest {
         val issuedTokens1 = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
         val issuedTokens = issuedTokens1 + issueTokens(carly, network, listOf(NodeHolding(bob, 20L)), source)
 
-        val expectedOutput1: FungibleToken = createFrom(alice, dan, 10L, source)
-        val expectedOutput2: FungibleToken = createFrom(carly, dan, 20L, source)
+        val expectedOutput1: FungibleRECToken = createFrom(alice, dan, 10L, source)
+        val expectedOutput2: FungibleRECToken = createFrom(carly, dan, 20L, source)
 
         val flow = Initiator(issuedTokens, listOf(expectedOutput1, expectedOutput2))
 
