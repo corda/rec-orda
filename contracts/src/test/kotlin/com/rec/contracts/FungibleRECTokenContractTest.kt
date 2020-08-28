@@ -55,6 +55,7 @@ class FungibleRECTokenContractTest {
                 verifies()
             }
 
+            // With the correct command and signed by the issuer.
             tweak {
                 command(alice.owningKey, IssueTokenCommand(issuedToken, listOf(0)))
                 attachment("com.rec.contracts.FungibleRECTokenContract", RECToken(source).getAttachmentIdForGenericParam()!!)
