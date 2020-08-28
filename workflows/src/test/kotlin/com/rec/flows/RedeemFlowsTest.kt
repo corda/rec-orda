@@ -19,7 +19,7 @@ import org.junit.Before
 import org.junit.Test
 import java.util.function.Consumer
 
-class RedeemFlowsTests {
+class RedeemFlowsTest {
     private val network: MockNetwork = MockNetwork(prepareMockNetworkParameters)
     private val alice: StartedMockNode = network.createNode()
     private val bob: StartedMockNode = network.createNode()
