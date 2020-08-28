@@ -13,6 +13,7 @@ import net.corda.testing.node.*
 import java.io.File
 import java.util.*
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 object FlowTestHelpers {
     private fun propertiesFromConf(pathname: String): Map<String, String> {
@@ -67,6 +68,24 @@ object FlowTestHelpers {
         assertEquals(tokenStates.size, vaultTokens.size)
         tokenStates.indices.forEach {
             assertEquals(vaultTokens[it].state.data, tokenStates[it])
+        }
+    }
+
+    fun assertHasRECTokenAsTokenTypeInVault(node: StartedMockNode) {
+        val vaultTokens = node.transaction {
+            node.services.vaultService.queryBy(FungibleRECToken::class.java).states
+        }
+        vaultTokens.forEach {
+            assertTrue(it.state.data.tokenType is RECToken)
+        }
+    }
+
+    fun assertHasSourceInVault(node: StartedMockNode, source: List<EnergySource>) {
+        val vaultTokens = node.transaction {
+            node.services.vaultService.queryBy(FungibleRECToken::class.java).states
+        }
+        vaultTokens.indices.forEach {
+            assertEquals((vaultTokens[it].state.data.tokenType as RECToken).source, source[it])
         }
     }
 
