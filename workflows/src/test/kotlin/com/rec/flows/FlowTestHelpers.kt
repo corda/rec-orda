@@ -29,7 +29,7 @@ object FlowTestHelpers {
                         })
     }
 
-    private val tokensConfig = propertiesFromConf("res/tokens-workflows.conf")
+    val tokensConfig = propertiesFromConf("res/tokens-workflows.conf")
 
     val prepareMockNetworkParameters: MockNetworkParameters = MockNetworkParameters()
             .withNotarySpecs(listOf(
