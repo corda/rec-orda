@@ -13,7 +13,6 @@ import net.corda.testing.node.*
 import java.io.File
 import java.util.*
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 object FlowTestHelpers {
     private fun propertiesFromConf(pathname: String): Map<String, String> {
@@ -29,7 +28,7 @@ object FlowTestHelpers {
                         })
     }
 
-    val tokensConfig = propertiesFromConf("res/tokens-workflows.conf")
+    private val tokensConfig = propertiesFromConf("res/tokens-workflows.conf")
 
     val prepareMockNetworkParameters: MockNetworkParameters = MockNetworkParameters()
             .withNotarySpecs(listOf(
