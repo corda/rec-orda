@@ -1,8 +1,8 @@
 package com.rec.flows
 
 import co.paralleluniverse.fibers.Suspendable
-import com.r3.corda.lib.tokens.workflows.flows.move.AbstractMoveTokensFlow
-import com.r3.corda.lib.tokens.workflows.flows.move.addMoveTokens
+import com.r3.corda.lib.tokens.workflows.flows.move.MoveTokensFlow
+import com.r3.corda.lib.tokens.workflows.flows.move.MoveTokensFlowHandler
 import com.r3.corda.lib.tokens.workflows.flows.rpc.MoveFungibleTokensHandler
 import com.r3.corda.lib.tokens.workflows.utilities.sessionsForParties
 import com.rec.states.FungibleRECToken
@@ -10,7 +10,6 @@ import net.corda.core.contracts.StateAndRef
 import net.corda.core.flows.*
 import net.corda.core.identity.AbstractParty
 import net.corda.core.transactions.SignedTransaction
-import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
 
 object MoveFlows {
@@ -49,15 +48,7 @@ object MoveFlows {
 
             val participantSessions = this.sessionsForParties(allParticipants)
 
-            return subFlow(object : AbstractMoveTokensFlow() {
-                override val participantSessions = participantSessions
-
-                override val observerSessions: List<FlowSession> = emptyList()
-
-                override fun addMove(transactionBuilder: TransactionBuilder) {
-                    addMoveTokens(transactionBuilder, inputTokens, outputTokens)
-                }
-            })
+            return subFlow(MoveTokensFlow(inputTokens, outputTokens, participantSessions))
         }
 
         companion object {
