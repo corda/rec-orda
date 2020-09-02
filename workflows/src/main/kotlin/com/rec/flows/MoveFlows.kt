@@ -60,4 +60,11 @@ object MoveFlows {
             }
         }
     }
+
+    @InitiatedBy(Initiator::class)
+    class Responder(private val otherSession: FlowSession) : FlowLogic<Unit>() {
+        @Suspendable
+        @Throws(FlowException::class)
+        override fun call(): Unit = subFlow(MoveTokensFlowHandler(otherSession))
+    }
 }
