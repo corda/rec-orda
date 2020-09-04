@@ -23,10 +23,10 @@ import net.corda.testing.core.TestIdentity
 import net.corda.testing.core.expect
 import net.corda.testing.core.expectEvents
 import net.corda.testing.core.singleIdentity
-import net.corda.testing.driver.NodeHandle
 import net.corda.testing.node.User
 import org.junit.Test
 import rx.Observable
+import java.util.concurrent.TimeUnit
 import kotlin.test.assertEquals
 
 class DriverBasedTest {
@@ -37,6 +37,7 @@ class DriverBasedTest {
             startFlow<IssueFlows.Initiator>(),
             startFlow<MoveFlows.Initiator>(),
             startFlow<MoveFlows.Responder>(),
+            startFlow<RedeemFlows.Responder>(),
             invokeRpc("vaultTrackBy"),
             invokeRpc("vaultQueryBy")
     ))
@@ -50,7 +51,40 @@ class DriverBasedTest {
     ))
 
     @Test
-    fun `issue, move and redeem integration test`() = withDriver {
+    fun `issue integration test`() = withDriver {
+
+        val (alice, bob) = startNodes(
+                prosumer withUsers listOf(aliceUser),
+                utilityProvider withUsers listOf(bobUser)
+        )
+
+        val aliceProxy: CordaRPCOps = alice.getProxy("aliceUser", "testPassword1")
+        val bobProxy: CordaRPCOps = bob.getProxy("bobUser", "testPassword2")
+
+        val aliceVaultUpdates: Observable<Vault.Update<FungibleRECToken>> = aliceProxy.vaultTrackBy<FungibleRECToken>().updates
+//        val bobVaultUpdates: Observable<Vault.Update<FungibleRECToken>> = bobProxy.vaultTrackBy<FungibleRECToken>().updates
+
+
+        // issue
+        aliceProxy.startFlowDynamic(
+                IssueFlows.Initiator::class.java,
+                alice.nodeInfo.singleIdentity(),
+                10L,
+                EnergySource.WIND
+        ).returnValue.getOrThrow()
+
+        aliceVaultUpdates.expectEvents {
+            expect { update ->
+                val produced: FungibleRECToken = update.produced.first().state.data
+                assertEquals(alice.nodeInfo.legalIdentities.single(), produced.holder)
+                assertEquals(RECToken(EnergySource.WIND), produced.recToken)
+                assertEquals(10L, produced.amount.quantity)
+            }
+        }
+    }
+
+    @Test
+    fun `move integration test`() = withDriver {
 
         val (alice, bob) = startNodes(
                 prosumer withUsers listOf(aliceUser),
@@ -63,45 +97,94 @@ class DriverBasedTest {
         val aliceVaultUpdates: Observable<Vault.Update<FungibleRECToken>> = aliceProxy.vaultTrackBy<FungibleRECToken>().updates
         val bobVaultUpdates: Observable<Vault.Update<FungibleRECToken>> = bobProxy.vaultTrackBy<FungibleRECToken>().updates
 
-        issue(aliceProxy, alice, aliceVaultUpdates)
 
-        move(aliceProxy, bob, bobVaultUpdates)
-    }
-
-    private fun issue(sender: CordaRPCOps, receiver: NodeHandle, receiverVaultUpdates: Observable<Vault.Update<FungibleRECToken>>) {
-        sender.startFlowDynamic(
+        // issue
+        aliceProxy.startFlowDynamic(
                 IssueFlows.Initiator::class.java,
-                receiver.nodeInfo.singleIdentity(),
+                alice.nodeInfo.singleIdentity(),
                 10L,
                 EnergySource.WIND
         ).returnValue.getOrThrow()
 
-        receiverVaultUpdates.expectEvents {
+        // move
+        val moveInput: List<StateAndRef<FungibleRECToken>> = aliceProxy.vaultQueryBy<FungibleRECToken>().states
+        val moveOutput: List<FungibleRECToken> = moveInput.map { it.state.data withNewHolder bob.nodeInfo.singleIdentity() }
+
+        aliceProxy.startFlowDynamic(
+                MoveFlows.Initiator::class.java,
+                moveInput,
+                moveOutput
+        ).returnValue.getOrThrow()
+
+        bobVaultUpdates.expectEvents {
             expect { update ->
-                val token: FungibleRECToken = update.produced.first().state.data
-                assertEquals(RECToken(EnergySource.WIND), token.recToken)
-                assertEquals(10L, token.amount.quantity)
+                val produced: FungibleRECToken = update.produced.first().state.data
+                assertEquals(bob.nodeInfo.legalIdentities.single(), produced.holder)
+                assertEquals(RECToken(EnergySource.WIND), produced.recToken)
+                assertEquals(10L, produced.amount.quantity)
+            }
+        }
+
+        aliceVaultUpdates.expectEvents {
+            expect { update ->
+                val produced: FungibleRECToken = update.produced.first().state.data
+                assertEquals(alice.nodeInfo.legalIdentities.single(), produced.holder)
+                assertEquals(RECToken(EnergySource.WIND), produced.recToken)
+                assertEquals(10L, produced.amount.quantity)
             }
         }
     }
 
-    private fun move(sender: CordaRPCOps, receiver: NodeHandle, receiverVaultUpdates: Observable<Vault.Update<FungibleRECToken>>) {
-        val input: List<StateAndRef<FungibleRECToken>> = sender.vaultQueryBy<FungibleRECToken>().states
-        val output: List<FungibleRECToken> = input.map { it.state.data withNewHolder receiver.nodeInfo.singleIdentity() }
+    @Test
+    fun `redeem integration test`() = withDriver {
 
-        sender.startFlowDynamic(
+        val (alice, bob) = startNodes(
+                prosumer withUsers listOf(aliceUser),
+                utilityProvider withUsers listOf(bobUser)
+        )
+
+        val aliceProxy: CordaRPCOps = alice.getProxy("aliceUser", "testPassword1")
+        val bobProxy: CordaRPCOps = bob.getProxy("bobUser", "testPassword2")
+
+//        val aliceVaultUpdates: Observable<Vault.Update<FungibleRECToken>> = aliceProxy.vaultTrackBy<FungibleRECToken>().updates
+        val bobVaultUpdates: Observable<Vault.Update<FungibleRECToken>> = bobProxy.vaultTrackBy<FungibleRECToken>().updates
+
+        // issue
+        aliceProxy.startFlowDynamic(
+                IssueFlows.Initiator::class.java,
+                alice.nodeInfo.singleIdentity(),
+                10L,
+                EnergySource.WIND
+        ).returnValue.get(10L, TimeUnit.SECONDS)
+
+        // move
+        val moveInput: List<StateAndRef<FungibleRECToken>> = aliceProxy.vaultQueryBy<FungibleRECToken>().states
+        val moveOutput: List<FungibleRECToken> = moveInput.map { it.state.data withNewHolder bob.nodeInfo.singleIdentity() }
+
+        aliceProxy.startFlowDynamic(
                 MoveFlows.Initiator::class.java,
-                input,
-                output
+                moveInput,
+                moveOutput
         ).returnValue.getOrThrow()
 
-        receiverVaultUpdates.expectEvents {
+        // need to wait until the token actually moves. Takes some time, could do Thread.sleep(2000L).
+        bobVaultUpdates.expectEvents {
             expect { update ->
-                val token: FungibleRECToken = update.produced.first().state.data
-                assertEquals(RECToken(EnergySource.WIND), token.recToken)
-                assertEquals(10L, token.amount.quantity)
+                val produced: FungibleRECToken = update.produced.first().state.data
+                assertEquals(bob.nodeInfo.legalIdentities.single(), produced.holder)
+                assertEquals(RECToken(EnergySource.WIND), produced.recToken)
+                assertEquals(10L, produced.amount.quantity)
             }
         }
+
+        // make sure you wait long enough otherwise bob's vault will be empty.
+        // redeem
+        val redeemInput: List<StateAndRef<FungibleRECToken>> = bobProxy.vaultQueryBy<FungibleRECToken>().states
+
+        bobProxy.startFlowDynamic(
+                RedeemFlows.Initiator::class.java,
+                redeemInput
+        ).returnValue.getOrThrow()
     }
 
 
