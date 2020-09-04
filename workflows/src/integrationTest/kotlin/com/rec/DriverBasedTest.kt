@@ -17,7 +17,8 @@ import net.corda.core.messaging.vaultQueryBy
 import net.corda.core.messaging.vaultTrackBy
 import net.corda.core.node.services.Vault
 import net.corda.core.utilities.getOrThrow
-import net.corda.node.services.Permissions
+import net.corda.node.services.Permissions.Companion.invokeRpc
+import net.corda.node.services.Permissions.Companion.startFlow
 import net.corda.testing.core.TestIdentity
 import net.corda.testing.core.expect
 import net.corda.testing.core.expectEvents
@@ -33,15 +34,19 @@ class DriverBasedTest {
     private val utilityProvider = TestIdentity(CordaX500Name("Utility Provider", "", "GB"))
 
     private val aliceUser = User("aliceUser", "testPassword1", permissions = setOf(
-            Permissions.startFlow<IssueFlows.Initiator>(),
-            Permissions.startFlow<MoveFlows.Initiator>(),
-            Permissions.invokeRpc("vaultTrackBy")
+            startFlow<IssueFlows.Initiator>(),
+            startFlow<MoveFlows.Initiator>(),
+            startFlow<MoveFlows.Responder>(),
+            invokeRpc("vaultTrackBy"),
+            invokeRpc("vaultQueryBy")
     ))
 
     private val bobUser = User("bobUser", "testPassword2", permissions = setOf(
-            Permissions.startFlow<MoveFlows.Initiator>(),
-            Permissions.startFlow<RedeemFlows.Initiator>(),
-            Permissions.invokeRpc("vaultTrackBy")
+            startFlow<MoveFlows.Initiator>(),
+            startFlow<MoveFlows.Initiator>(),
+            startFlow<RedeemFlows.Initiator>(),
+            invokeRpc("vaultTrackBy"),
+            invokeRpc("vaultQueryBy")
     ))
 
     @Test
@@ -56,21 +61,41 @@ class DriverBasedTest {
         val bobProxy: CordaRPCOps = bob.getProxy("bobUser", "testPassword2")
 
         val aliceVaultUpdates: Observable<Vault.Update<FungibleRECToken>> = aliceProxy.vaultTrackBy<FungibleRECToken>().updates
+        val bobVaultUpdates: Observable<Vault.Update<FungibleRECToken>> = bobProxy.vaultTrackBy<FungibleRECToken>().updates
 
         issue(aliceProxy, alice, aliceVaultUpdates)
 
-
+        move(aliceProxy, bob, bobVaultUpdates)
     }
 
-    private fun issue(aliceProxy: CordaRPCOps, alice: NodeHandle, aliceVaultUpdates: Observable<Vault.Update<FungibleRECToken>>) {
-        aliceProxy.startFlowDynamic(
+    private fun issue(sender: CordaRPCOps, receiver: NodeHandle, receiverVaultUpdates: Observable<Vault.Update<FungibleRECToken>>) {
+        sender.startFlowDynamic(
                 IssueFlows.Initiator::class.java,
-                alice.nodeInfo.singleIdentity(),
+                receiver.nodeInfo.singleIdentity(),
                 10L,
                 EnergySource.WIND
         ).returnValue.getOrThrow()
 
-        aliceVaultUpdates.expectEvents {
+        receiverVaultUpdates.expectEvents {
+            expect { update ->
+                val token: FungibleRECToken = update.produced.first().state.data
+                assertEquals(RECToken(EnergySource.WIND), token.recToken)
+                assertEquals(10L, token.amount.quantity)
+            }
+        }
+    }
+
+    private fun move(sender: CordaRPCOps, receiver: NodeHandle, receiverVaultUpdates: Observable<Vault.Update<FungibleRECToken>>) {
+        val input: List<StateAndRef<FungibleRECToken>> = sender.vaultQueryBy<FungibleRECToken>().states
+        val output: List<FungibleRECToken> = input.map { it.state.data withNewHolder receiver.nodeInfo.singleIdentity() }
+
+        sender.startFlowDynamic(
+                MoveFlows.Initiator::class.java,
+                input,
+                output
+        ).returnValue.getOrThrow()
+
+        receiverVaultUpdates.expectEvents {
             expect { update ->
                 val token: FungibleRECToken = update.produced.first().state.data
                 assertEquals(RECToken(EnergySource.WIND), token.recToken)
