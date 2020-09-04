@@ -187,7 +187,7 @@ class RedeemFlowsTest {
 
         // We check the state was consumed in both vaults.
         assertHasStatesInVault(alice, emptyList())
-        assertHasStatesInVault(alice, emptyList())
+        assertHasStatesInVault(bob, emptyList())
     }
 
     @Test
