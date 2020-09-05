@@ -194,3 +194,4 @@ class TokenUpdate(val consumed: Map<IssuedTokenType, Amount<IssuedTokenType>>, v
 class LinearStateUpdate(val consumed: Map<UniqueIdentifier, ContractState>, val produced: Map<UniqueIdentifier, ContractState>)
 
 class ContractStateUpdate(val consumed: Map<StateRef, ContractState>, val produced: Map<StateRef, ContractState>)
+
