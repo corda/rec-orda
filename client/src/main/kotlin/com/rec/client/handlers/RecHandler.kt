@@ -11,6 +11,7 @@ import net.corda.core.contracts.*
 import net.corda.core.node.services.Vault
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.node.services.vault.*
+import net.corda.nodeapi.internal.config.toConfig
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -22,6 +23,8 @@ import rx.RxReactiveStreams.toPublisher
 import rx.Single
 import org.json.simple.JSONObject
 import org.springframework.web.bind.annotation.CrossOrigin
+import reactor.core.publisher.Flux
+import reactor.core.publisher.toMono
 
 @Component
 class RecHandler(rpc: NodeRPCConnection) {
@@ -164,15 +167,17 @@ class RecHandler(rpc: NodeRPCConnection) {
                     }), ParameterizedTypeReference.forType(TokenUpdate::class.java)
             )
 
-    // NS:
-    // This POST method to Issue Tokens fails on the response: "net.corda.core.transactions.SignedTransaction cannot be cast to java.lang.CharSequence"
-    // You need to change the return type to something else, like string of the transaction ID for example (this will break your flow tests probably).
-    // This should be an easy fix
+    // NS: You could probably do this better below, I didn't want to change the flow from returning a SignedTransaction
+    // so instead just created a JSONObject out of the CompletableFuture - seems to return the future data.
     @CrossOrigin(origins = ["*"])
     fun IssueTokens(request: ServerRequest): Mono<ServerResponse> = request.bodyToMono(IssueTokensDto::class.java).flatMap {
-        val future = proxy.startFlowDynamic(IssueFlows.Initiator::class.java, it.holder, it.quantity, it.source).returnValue.toCompletableFuture()
+        val future = proxy.startFlowDynamic(IssueFlows.Initiator::class.java, it.holder, it.quantity, it.source).returnValue.toCompletableFuture().get()
+        val completedFlow = JSONObject()
+        completedFlow.put("response", future)
         ok()
-                .contentType(MediaType.APPLICATION_JSON).body(Mono.fromFuture(future), ParameterizedTypeReference.forType(String::class.java))
+                .body(toPublisher(Single.just(
+                        completedFlow
+                )), ParameterizedTypeReference.forType(JSONObject::class.java))
     }
 
 
