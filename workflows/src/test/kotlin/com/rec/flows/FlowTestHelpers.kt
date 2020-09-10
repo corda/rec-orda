@@ -1,14 +1,18 @@
 package com.rec.flows
 
+import com.r3.corda.lib.tokens.contracts.states.FungibleToken
+import com.r3.corda.lib.tokens.contracts.types.TokenType
+import com.r3.corda.lib.tokens.contracts.utilities.heldBy
 import com.r3.corda.lib.tokens.contracts.utilities.issuedBy
 import com.r3.corda.lib.tokens.contracts.utilities.of
 import com.rec.states.EnergySource
-import com.rec.states.FungibleRECToken
 import com.rec.states.RECToken
-import com.rec.states.heldBy
+import com.rec.states.RECToken.Companion.recToken
+import net.corda.core.contracts.Amount
 import net.corda.core.contracts.StateAndRef
 import net.corda.core.identity.AbstractParty
 import net.corda.core.identity.CordaX500Name
+import com.r3.corda.lib.tokens.workflows.types.PartyAndAmount
 import net.corda.testing.node.*
 import java.io.File
 import java.util.*
@@ -52,17 +56,17 @@ object FlowTestHelpers {
             holder: StartedMockNode,
             quantity: Long,
             source: EnergySource
-    ): FungibleRECToken = quantity of
+    ): FungibleToken = quantity of
             RECToken(source) issuedBy
             issuer.info.legalIdentities.first() heldBy
             holder.info.legalIdentities.first()
 
-    fun FungibleRECToken.toPair() = Pair(this.holder, this.amount.quantity)
+    fun FungibleToken.toPair() = Pair(this.holder, this.amount.quantity)
 
 
-    fun assertHasStatesInVault(node: StartedMockNode, tokenStates: List<FungibleRECToken>) {
+    fun assertHasStatesInVault(node: StartedMockNode, tokenStates: List<FungibleToken>) {
         val vaultTokens = node.transaction {
-            node.services.vaultService.queryBy(FungibleRECToken::class.java).states
+            node.services.vaultService.queryBy(FungibleToken::class.java).states
         }
         assertEquals(tokenStates.size, vaultTokens.size)
         tokenStates.indices.forEach {
@@ -72,7 +76,7 @@ object FlowTestHelpers {
 
     fun assertHasSourceInVault(node: StartedMockNode, source: List<EnergySource>) {
         val vaultTokens = node.transaction {
-            node.services.vaultService.queryBy(FungibleRECToken::class.java).states
+            node.services.vaultService.queryBy(FungibleToken::class.java).states
         }
         vaultTokens.indices.forEach {
             assertEquals(vaultTokens[it].state.data.recToken.source, source[it])
@@ -85,12 +89,18 @@ object FlowTestHelpers {
         }
     }
 
-    fun issueTokens(node: StartedMockNode, network: MockNetwork, nodeHoldings: Collection<NodeHolding>, source: EnergySource): List<StateAndRef<FungibleRECToken>> {
+    fun issueTokens(node: StartedMockNode, network: MockNetwork, nodeHoldings: Collection<NodeHolding>, source: EnergySource): List<StateAndRef<FungibleToken>> {
         val flow = IssueFlows.Initiator(nodeHoldings.map { it.toPair() }, source)
         val future = node.startFlow(flow)
         network.runNetwork()
         val tx = future.get()
-        return tx.toLedgerTransaction(node.services).outRefsOfType(FungibleRECToken::class.java)
+        return tx.toLedgerTransaction(node.services).outRefsOfType(FungibleToken::class.java)
     }
+
+    fun partyAndAmountOf(source: EnergySource, vararg nodeHoldings: NodeHolding): List<PartyAndAmount<TokenType>> =
+            nodeHoldings.map { it.holder withAmount (it.quantity of RECToken(source)) }
+
+    private infix fun StartedMockNode.withAmount(amount: Amount<TokenType>): PartyAndAmount<TokenType> =
+            PartyAndAmount(this.info.legalIdentities.single(), amount)
 
 }

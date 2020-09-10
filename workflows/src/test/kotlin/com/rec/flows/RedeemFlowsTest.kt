@@ -1,5 +1,6 @@
 package com.rec.flows
 
+import com.r3.corda.lib.tokens.contracts.utilities.of
 import com.r3.corda.lib.tokens.workflows.flows.redeem.RedeemTokensFlowHandler
 import com.rec.flows.FlowTestHelpers.NodeHolding
 import com.rec.flows.FlowTestHelpers.assertHasStatesInVault
@@ -8,9 +9,8 @@ import com.rec.flows.FlowTestHelpers.issueTokens
 import com.rec.flows.FlowTestHelpers.prepareMockNetworkParameters
 import com.rec.flows.RedeemFlows.Initiator
 import com.rec.states.EnergySource
-import com.rec.states.FungibleRECToken
+import com.rec.states.RECToken
 import net.corda.core.contracts.ContractState
-import net.corda.core.contracts.StateAndRef
 import net.corda.testing.node.MockNetwork
 import net.corda.testing.node.StartedMockNode
 import org.junit.After
@@ -44,9 +44,8 @@ class RedeemFlowsTest {
     @Test
     @Throws(Throwable::class)
     fun `signed transaction returned by the flow is signed by both the issuer and the holder`() {
-        val tokens = issueTokens(
-                alice, network, listOf(NodeHolding(bob, 10L)), source)
-        val flow = Initiator(tokens)
+        issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
+        val flow = Initiator(10L of RECToken(source), alice.info.legalIdentities.single())
         val future = bob.startFlow(flow)
         network.runNetwork()
         val tx = future.get()!!
@@ -58,16 +57,11 @@ class RedeemFlowsTest {
     @Throws(Throwable::class)
     fun `signed transaction returned by the flow is signed by both issuers and the holder`() {
         val tokens1 = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
-        val tokens = tokens1 + issueTokens(carly, network, listOf(NodeHolding(bob, 20L)), source)
-
-        val flow = Initiator(listOf(tokens[0]))
-
+        tokens1 + issueTokens(carly, network, listOf(NodeHolding(bob, 20L)), source)
+        val flow = Initiator(10L of RECToken(source), alice.info.legalIdentities.single())
         val future = bob.startFlow(flow)
-
         network.runNetwork()
-
         val tx = future.get()!!
-
 
         tx.verifySignaturesExcept(listOf(
           bob.info.legalIdentities[0].owningKey,
@@ -83,12 +77,10 @@ class RedeemFlowsTest {
     @Test
     @Throws(Throwable::class)
     fun `flow records a transaction in issuer and holder transaction storage only`() {
-        val tokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
-        val flow = Initiator(tokens)
+        issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
+        val flow = Initiator(10L of RECToken(source), alice.info.legalIdentities.single())
         val future = bob.startFlow(flow)
-
         network.runNetwork()
-
         val tx = future.get()!!
 
         // We check the recorded transaction in both transaction storage.
@@ -104,14 +96,11 @@ class RedeemFlowsTest {
     @Throws(Throwable::class)
     fun `flow records a transaction in both issuers and holder transaction storage only`() {
         val tokens1 = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
-        val tokens = tokens1 + (issueTokens(carly, network, listOf(NodeHolding(bob, 20L)), source))
+        tokens1 + (issueTokens(carly, network, listOf(NodeHolding(bob, 20L)), source))
 
-        val flow = Initiator(listOf(tokens[0]))
-
+        val flow = Initiator(10L of RECToken(source), alice.info.legalIdentities.single())
         val future = bob.startFlow(flow)
-
         network.runNetwork()
-
         val tx = future.get()!!
 
         // We check the recorded transaction in both transaction storage.
@@ -124,18 +113,10 @@ class RedeemFlowsTest {
     @Test
     @Throws(Throwable::class)
     fun `flow records a transaction in issuer and both holder transaction storage`() {
-        val tokens = issueTokens(
-                alice, network, listOf(
-                NodeHolding(bob, 10L),
-                NodeHolding(carly, 20L)), source
-        )
-
-        val flow = Initiator(listOf(tokens[0]))
-
+        issueTokens(alice, network, listOf(NodeHolding(bob, 10L), NodeHolding(carly, 20L)), source)
+        val flow = Initiator(10L of RECToken(source), alice.info.legalIdentities.single())
         val future = bob.startFlow(flow)
-
         network.runNetwork()
-
         val tx = future.get()!!
 
         // We check the recorded transaction in transaction storage.
@@ -150,11 +131,8 @@ class RedeemFlowsTest {
     fun `recorded transaction has a single input the fungible RECToken and no outputs`() {
         val expected = createFrom(alice, bob, 10L, source)
 
-        val tokens: List<StateAndRef<FungibleRECToken>> = issueTokens(
-                alice, network, listOf(NodeHolding(bob, 10L)), source
-        )
-
-        val flow = Initiator(tokens)
+        issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
+        val flow = Initiator(10L of RECToken(source), alice.info.legalIdentities.single())
 
         val future = bob.startFlow(flow)
 
@@ -175,9 +153,9 @@ class RedeemFlowsTest {
     @Test
     @Throws(Throwable::class)
     fun `there is no recorded state after redeem`() {
-        val tokens = issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
+        issueTokens(alice, network, listOf(NodeHolding(bob, 10L)), source)
 
-        val flow = Initiator(tokens)
+        val flow = Initiator(10L of RECToken(source), alice.info.legalIdentities.single())
 
         val future = bob.startFlow(flow)
 
@@ -195,18 +173,10 @@ class RedeemFlowsTest {
     fun `recorded transaction has many inputs the fungible RECTokens and no outputs`() {
         val expected = createFrom(alice, bob, 10L, source)
 
-        val tokens: List<StateAndRef<FungibleRECToken>> = issueTokens(
-                alice, network, listOf(
-                NodeHolding(bob, 10L),
-                NodeHolding(carly, 20L)), source
-        )
-
-        val flow = Initiator(listOf(tokens[0]))
-
+        issueTokens(alice, network, listOf(NodeHolding(bob, 10L), NodeHolding(carly, 20L)), source)
+        val flow = Initiator(10L of RECToken(source), alice.info.legalIdentities.single())
         val future = bob.startFlow(flow)
-
         network.runNetwork()
-
         val tx = future.get()!!
 
         // We check the recorded transaction in the 3 vaults.
@@ -229,7 +199,7 @@ class RedeemFlowsTest {
                 NodeHolding(carly, 20L)), source
         )
 
-        val flow = Initiator(listOf(tokens[0]))
+        val flow = Initiator(10L of RECToken(source), alice.info.legalIdentities.single())
 
         val future = bob.startFlow(flow)
 
