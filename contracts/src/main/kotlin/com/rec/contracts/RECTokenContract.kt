@@ -1,18 +1,15 @@
 package com.rec.contracts
 
-import com.r3.corda.lib.tokens.contracts.FungibleTokenContract
-import com.r3.corda.lib.tokens.contracts.commands.TokenCommand
-import com.r3.corda.lib.tokens.contracts.states.FungibleToken
-import net.corda.core.contracts.*
+import net.corda.core.contracts.Contract
+import net.corda.core.transactions.LedgerTransaction
 
-class FungibleRECTokenContract: FungibleTokenContract(), Contract {
+class RECTokenContract: Contract {
     companion object {
         // Used to identify our contract when building a transaction.
         val contractId: String = this::class.java.enclosingClass.canonicalName
     }
 
-    override fun verifyIssue(issueCommand: CommandWithParties<TokenCommand>, inputs: List<IndexedState<FungibleToken>>, outputs: List<IndexedState<FungibleToken>>, attachments: List<Attachment>, references: List<StateAndRef<ContractState>>) {
-        super.verifyIssue(issueCommand, inputs, outputs, attachments, references)
-        // require that right to issue is Approved
+    override fun verify(tx: LedgerTransaction) {
+        return
     }
 }
