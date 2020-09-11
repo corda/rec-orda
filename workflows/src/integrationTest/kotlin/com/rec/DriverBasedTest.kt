@@ -3,7 +3,6 @@ package com.rec
 import com.r3.corda.lib.tokens.contracts.states.FungibleToken
 import com.r3.corda.lib.tokens.contracts.types.TokenType
 import com.r3.corda.lib.tokens.contracts.utilities.of
-import com.r3.corda.lib.tokens.workflows.flows.rpc.MoveFungibleTokens
 import com.r3.corda.lib.tokens.workflows.flows.rpc.MoveFungibleTokensHandler
 import com.r3.corda.lib.tokens.workflows.flows.rpc.RedeemFungibleTokensHandler
 import com.r3.corda.lib.tokens.workflows.types.PartyAndAmount
