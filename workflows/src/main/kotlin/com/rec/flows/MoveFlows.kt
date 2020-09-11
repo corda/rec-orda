@@ -13,7 +13,7 @@ import net.corda.core.transactions.SignedTransaction
 object MoveFlows {
     @InitiatingFlow
     @StartableByRPC
-    class Initiator(private val partiesAndAmounts: List<PartyAndAmount<TokenType>>) : FlowLogic<SignedTransaction?>() {
+    class Initiator(private val partiesAndAmounts: List<PartyAndAmount<TokenType>>) : FlowLogic<SignedTransaction>() {
 
         @Suspendable
         @Throws(FlowException::class)
